@@ -1,8 +1,5 @@
 # Projet
 
-Version en Java, maintenue car plus optimisée et rapide.
-Chaque lien mène vers le code source ou le dossier lui correspondant.<br>
-
 Build le projet nécessite [`Java 11`](https://adoptium.net/) minimum.<br>
 Deux possibilités pour lancer le bot (à partir de la racine du projet) :
 - Exécuter `./gradlew run` dans un terminal
