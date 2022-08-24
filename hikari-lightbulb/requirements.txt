@@ -1,0 +1,12 @@
+hikari
+hikari-lightbulb
+lavasnek_rs
+
+python-dotenv
+dnspython
+aiohttp
+cairosvg
+chess
+matplotlib
+motor
+pynacl
