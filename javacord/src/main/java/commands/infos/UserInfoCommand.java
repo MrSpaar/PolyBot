@@ -62,7 +62,7 @@ public class UserInfoCommand implements SlashCommandCreateListener {
         for (Activity activity: user.getActivities()) {
             switch (activity.getType()) {
                 case PLAYING -> activities.append("Joue à `").append(activity.getName()).append("`\n");
-                case LISTENING -> activities.append("Ecoute `").append(activity.getDetails()).append("`\n");
+                case LISTENING -> activities.append("Ecoute `").append(activity.getDetails().orElse("")).append("`\n");
                 case STREAMING -> activities.append("Stream sur ").append(activity.getName()).append(" : `")
                         .append(activity.getDetails().orElse("")).append("`\n");
             }
