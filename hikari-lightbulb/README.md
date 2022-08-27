@@ -14,40 +14,40 @@ Pour lancer le bot :
 
 ### • 🧍 Commandes utilisateur
 
-| Categorie                                                                            | Commandes                                      |
-|--------------------------------------------------------------------------------------|------------------------------------------------|
-| [Fun](https://github.com/MrSpaar/Hikari-PolyBot/blob/master/plugins/fun.py)          | `chess` `pendu` `coinflip` `roll` `reaction`   |
-| [Musique](https://github.com/MrSpaar/Hikari-PolyBot/blob/master/plugins/music.py)    | `play` `leave` `skip` `pause` `resume`         |
-| [Recherche](https://github.com/MrSpaar/Hikari-PolyBot/blob/master/plugins/search.py) | `twitch` `youtube` `wikipedia` `anime` `meteo` |
-| [Infos](https://github.com/MrSpaar/Hikari-PolyBot/blob/master/plugins/infos.py)      | `info server` `info user` `info role`          |
-| [Divers](https://github.com/MrSpaar/Hikari-PolyBot/blob/master/plugins/misc.py)      | `poll` `pp` `emoji`                            |
-| [Niveaux](https://github.com/MrSpaar/Hikari-PolyBot/blob/master/plugins/levels.py)   | `rank` `levels`                                |
+| Categorie                                                                                      | Commandes                                      |
+|------------------------------------------------------------------------------------------------|------------------------------------------------|
+| [Fun](https://github.com/MrSpaar/PolyBot/blob/master/hikari-lightbulb/plugins/fun.py)          | `chess` `pendu` `coinflip` `roll` `reaction`   |
+| [Musique](https://github.com/MrSpaar/PolyBot/blob/master/hikari-lightbulb/plugins/music.py)    | `play` `leave` `skip` `pause` `resume`         |
+| [Recherche](https://github.com/MrSpaar/PolyBot/blob/master/hikari-lightbulb/plugins/search.py) | `twitch` `youtube` `wikipedia` `anime` `meteo` |
+| [Infos](https://github.com/MrSpaar/PolyBot/blob/master/hikari-lightbulb/plugins/infos.py)      | `info server` `info user` `info role`          |
+| [Divers](https://github.com/MrSpaar/PolyBot/blob/master/hikari-lightbulb/plugins/misc.py)      | `poll` `pp` `emoji`                            |
+| [Niveaux](https://github.com/MrSpaar/PolyBot/blob/master/hikari-lightbulb//levels.py)          | `rank` `levels`                                |
 
 ### • 🔒 Commandes admin
 
-| Categorie                                                                                 | Commandes                    |
-|-------------------------------------------------------------------------------------------|------------------------------|
-| [Modération](https://github.com/MrSpaar/Hikari-PolyBot/blob/master/plugins/moderation.py) | `clear` `kick` `ban` `unban` |
-| [Menus](https://github.com/MrSpaar/Hikari-PolyBot/blob/master/plugins/utility.py)         | `menu`                       |
+| Categorie                                                                                            | Commandes                    |
+|------------------------------------------------------------------------------------------------------|------------------------------|
+| [Modération](https://github.com/MrSpaar/PolyBot/blob/master/hikari-lightbulb/plugins/moderation.py)  | `clear` `kick` `ban` `unban` |
+| [Menus](https://github.com/MrSpaar/PolyBot/blob/master/hikari-lightbulb/plugins/utility.py)          | `menu`                       |
 
 # Modules supplémentaires
 
-### • 📈 [Système d'expérience](https://github.com/MrSpaar/Hikari-PolyBot/blob/master/plugins/levels.py)
+### • 📈 [Système d'expérience](https://github.com/MrSpaar/PolyBot/blob/master/hikari-lightbulb/plugins/levels.py)
 
 Le système a la **même courbe d'xp que [Mee6](https://mee6.xyz/)**. <br>
 Ecrivez `!set channel <#channel>` pour définir le salon où le bot fait ses annonces de level up.<br>
 `!rank` vous montrera votre niveau, expérience et position dans le classement du serveur.<br>
 `!levels` vous montrera le classement du serveur par page de 10.
 
-### • ⏲️ [Channels temporaires](https://github.com/MrSpaar/Hikari-PolyBot/blob/master/plugins/channels.py)
+### • ⏲️ [Channels temporaires](https://github.com/MrSpaar/PolyBot/blob/master/hikari-lightbulb/plugins/channels.py)
 
 Ce module permet d'avoir des channels vocaux temporaires :
 
-- Chaque channel contenant [ce prefix](https://github.com/MrSpaar/Hikari-PolyBot/blob/master/plugins/channels.py#L18) génèrera un channel tempaire dès que quelqu'un le rejoindra.
+- Chaque channel contenant [ce prefix](https://github.com/MrSpaar/PolyBot/blob/master/hikari-lightbulb/plugins/channels.py#L18) génèrera un channel tempaire dès que quelqu'un le rejoindra.
 - Un channel écrit est généré et lié avec le channel temporaire.
 - Les deux sont supprimés dès que le channel vocal est vide.
 
-### • 📝 [Logs](https://github.com/MrSpaar/Hikari-PolyBot/blob/master/plugins/logs.py)
+### • 📝 [Logs](https://github.com/MrSpaar/PolyBot/blob/master/plugins/logs.py)
 
 Ecrivez `!set logs <#channel>` pour définir le channel contenant les logs.
 
@@ -61,7 +61,7 @@ Ecrivez `!set logs <#channel>` pour définir le channel contenant les logs.
 | Message supprimé           | Contenu du message, images, auteur et salon             |
 | Création d'invitation      | Lien, autheur, date d'expiration, nombre d'utilisations |
 
-### • ❌ [Gestion d'erreurs](https://github.com/MrSpaar/PolyBot/blob/master/modules/errors.py)
+### • ❌ [Gestion d'erreurs](https://github.com/MrSpaar/PolyBot/blob/master/hikari-lightbulb/modules/errors.py)
 
 Ce module permet d'afficher des messages d'erreurs. A chaque erreur, un message suivi d'un exemple est envoyé.<br>
 S'il s'agit d'une commande inconnue, la commande la plus proche apparait également dans le message d'erreur.
