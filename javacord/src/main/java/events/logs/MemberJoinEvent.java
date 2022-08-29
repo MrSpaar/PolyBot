@@ -34,7 +34,7 @@ public class MemberJoinEvent implements ServerMemberJoinListener {
     private void sendLog(ServerTextChannel channel, User user) {
         channel.sendMessage(new EmbedBuilder()
                 .setColor(Global.GREEN)
-                .setDescription(":inbox_tray: " + user.getMentionTag() + "a rejoint le serveur !")
+                .setDescription(":inbox_tray: " + user.getMentionTag() + " a rejoint le serveur !")
         );
     }
 
