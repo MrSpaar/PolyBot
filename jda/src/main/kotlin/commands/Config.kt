@@ -43,7 +43,7 @@ class Config: ListenerAdapter() {
         val guildId = event.guild!!.idLong
         val param = event.getOption("parametre")!!.asString
 
-        val message = event.getOption("message")?.asString
+        val message = event.getOption("message")?.asString ?: ""
         val role = event.getOption("role")?.asRole?.idLong ?: 0
         val channel = event.getOption("role")?.asChannel?.idLong ?: 0
 
