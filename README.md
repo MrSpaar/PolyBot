@@ -7,10 +7,10 @@ C'est **un bot discord multi-fonction** privé mais **open-source** :
 - Système de niveaux
 - Intégration API
 
-Au fil du temps, j'ai été ammené à implémenter mon bot avec différentes libraries :
+Il existe plusieurs versions du Bot :
 
-| Librairie                                                                           | Langage | Maintenu |
-|-------------------------------------------------------------------------------------|---------|----------|
-| [javacord](https://github.com/MrSpaar/PolyBot/tree/master/javacord)                 | Java    | ✅        |
-| [discord.py](https://github.com/MrSpaar/PolyBot/tree/master/discord.py)             | Python  | ❌        |
-| [hikari-lightbulb](https://github.com/MrSpaar/PolyBot/tree/master/hikari-lightbulb) | Python  | ❌        |
+|           | [JDA](jda)       | [Javacord](javacord) | [Lightbulb](hikari-lightbulb) | [Discord.py](discord.py) |
+|-----------|------------------|----------------------|-------------------------------|--------------------------|
+| Langage   | Kotlin           | Java                 | Python                        | Python                   |
+| Etat      | En développement | Terminé              | Terminé                       | Obselète                 |
+| Commandes | Slash            | Slash                | Slash                         | Texte                    |
