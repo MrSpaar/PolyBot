@@ -11,7 +11,8 @@ object Vars {
 object Colors {
     const val GREEN = 0x2ECC71
     const val ORANGE = 0xC27C0E
-    const val RED = 0x3498DB
+    const val RED = 0xE74C3C
+    const val BLUE = 0x3498DB
 }
 
 fun replyEmbed(interaction: SlashCommandInteraction, color: Int, description: String, ephemeral: Boolean = false) {
