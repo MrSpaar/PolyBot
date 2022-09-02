@@ -1,7 +1,9 @@
 import commands.Config
+import commands.Moderation
 import net.dv8tion.jda.api.JDABuilder
 import net.dv8tion.jda.api.OnlineStatus
 import net.dv8tion.jda.api.entities.Activity
+import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData
 import sun.misc.Signal
 
 fun main() {
@@ -10,11 +12,12 @@ fun main() {
                         .setActivity(Activity.playing("vous observer"))
                         .build()
 
-    arrayOf(1013076480961560628L).forEach {
-        jda.awaitReady().getGuildById(it)!!.updateCommands().addCommands(
-            Config.build(jda)
-        ).queue()
+    val commands = arrayListOf<SlashCommandData>().apply {
+        this.add(Config.build(jda))
+        this.addAll(Moderation.build(jda))
     }
+
+    jda.awaitReady().getGuildById(1013076480961560628L)!!.updateCommands().addCommands(commands).queue()
 
     println("Bot is ready !")
     Signal.handle(Signal("INT")) { jda.shutdown() }
