@@ -1,6 +1,5 @@
-import commands.Config
-import commands.Moderation
-import commands.Utility
+import commands.*
+import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.JDABuilder
 import net.dv8tion.jda.api.OnlineStatus
 import net.dv8tion.jda.api.entities.Activity
@@ -13,14 +12,18 @@ fun main() {
                         .setActivity(Activity.playing("vous observer"))
                         .build()
 
+    buildCommands(jda)
+    println("Bot is ready !")
+    Signal.handle(Signal("INT")) { jda.shutdown() }
+}
+
+fun buildCommands(jda: JDA) {
     val commands = arrayListOf<SlashCommandData>().apply {
         this.add(Config.build(jda))
+        this.addAll(Games.build(jda))
         this.addAll(Moderation.build(jda))
         this.addAll(Utility.build(jda))
     }
 
     jda.awaitReady().getGuildById(1013076480961560628L)!!.updateCommands().addCommands(commands).queue()
-
-    println("Bot is ready !")
-    Signal.handle(Signal("INT")) { jda.shutdown() }
 }

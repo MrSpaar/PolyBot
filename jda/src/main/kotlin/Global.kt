@@ -13,6 +13,7 @@ object Colors {
     const val ORANGE = 0xC27C0E
     const val RED = 0xE74C3C
     const val BLUE = 0x3498DB
+    const val GOLD = 0xF1C40F
 }
 
 fun replyEmbed(interaction: SlashCommandInteraction, color: Int, description: String, ephemeral: Boolean = false) {
