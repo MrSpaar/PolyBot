@@ -14,8 +14,8 @@ object Colors {
     const val RED = 0x3498DB
 }
 
-fun replyEmbed(interaction: SlashCommandInteraction, color: Int, description: String) {
+fun replyEmbed(interaction: SlashCommandInteraction, color: Int, description: String, ephemeral: Boolean = false) {
     interaction.replyEmbeds(
         EmbedBuilder().setColor(color).setDescription(description).build()
-    ).queue()
+    ).setEphemeral(ephemeral).queue()
 }

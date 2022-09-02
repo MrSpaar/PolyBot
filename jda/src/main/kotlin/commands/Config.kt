@@ -36,7 +36,7 @@ class Config: ListenerAdapter() {
         if (event.name != "config" || event.guild == null) return
 
         if (!event.member!!.hasPermission(Permission.ADMINISTRATOR)) {
-            replyEmbed(event.interaction, Colors.RED, "Tu n'as pas la permission d'utiliser cette commande")
+            replyEmbed(event.interaction, Colors.RED, "❌ Tu n'as pas la permission d'utiliser cette commande")
             return
         }
 
