@@ -108,7 +108,7 @@ class Moderation: ListenerAdapter() {
         val reason = event.getOption("raison")?.asString ?: "Pas de raison"
 
         if (user == null) {
-            replyEmbed(event.interaction, Colors.RED, "❌ Aucun utilisateur correspondant trouvé")
+            replyEmbed(event.interaction, Colors.RED, "❌ Aucun utilisateur correspondant trouvé", true)
             return
         }
 

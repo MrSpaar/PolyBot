@@ -45,7 +45,7 @@ class Utility: ListenerAdapter() {
         val emoji = event.jda.getEmojiById(arg.replace("\\D+".toRegex(), ""))
 
         if (emoji == null) {
-            replyEmbed(event.interaction, Colors.RED, "❌ Emoji introuvable")
+            replyEmbed(event.interaction, Colors.RED, "❌ Emoji introuvable", true)
             return
         }
 

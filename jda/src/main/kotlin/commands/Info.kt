@@ -43,7 +43,7 @@ class Info: ListenerAdapter() {
 
     private fun userInfoCommand(event: SlashCommandInteractionEvent) {
         val member = event.guild!!.getMember(event.getOption("mention")?.asUser ?: event.user)
-            ?: return replyEmbed(event.interaction, Colors.RED, "❌ Cette commande n'est utilisable que dans un serveur")
+            ?: return replyEmbed(event.interaction, Colors.RED, "❌ Cette commande n'est utilisable que dans un serveur", true)
 
         var description = "\uD83D\uDCDD A créé son compte <t:${member.timeCreated.toEpochSecond()}:R>\n"
         description += "⏱️ A rejoint le serveur <t:${member.timeJoined.toEpochSecond()}:R>\n"
