@@ -13,6 +13,7 @@ Deux possibilités pour lancer le bot (à partir de la racine du projet) :
 |-------------------------------------------------|--------------------------------------|
 | [Jeux](./src/main/kotlin/commands/Games.kt)     | `coinflip` `pendu` `roll`            |
 | [Divers](./src/main/kotlin/commands/Utility.kt) | `sondage` `pfp` `emoji`              |
+| [Infos](./src/main/kotlin/commands/Info.kt)     | `serveur` `membre` `role`            |
 
 ### • 🔒 Commandes admin
 
