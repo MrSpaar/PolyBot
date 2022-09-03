@@ -20,7 +20,7 @@ class Moderation: ListenerAdapter() {
                 Commands.slash("clear", "Supprimer plusieurs messages en une fois").addOption(
                     OptionType.INTEGER, "n", "Le nombre de messages à supprimer", true
                 ),
-                Commands.slash("kick", "Exclure un membre").addOptions(
+                Commands.slash("kick", "Expulser un membre").addOptions(
                     OptionData(OptionType.USER, "membre", "Le membre à exclure", true),
                     OptionData(OptionType.STRING, "raison", "La raison de l'exclusion")
                 ),
