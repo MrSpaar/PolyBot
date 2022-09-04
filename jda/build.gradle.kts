@@ -24,4 +24,8 @@ dependencies {
     implementation("io.github.cdimascio:dotenv-kotlin:6.3.1")
     implementation("org.litote.kmongo:kmongo:4.7.0")
     implementation("org.apache.logging.log4j:log4j-slf4j-impl:2.18.0")
+    implementation("com.github.kittinunf.fuel:fuel:2.3.1")
+    implementation("com.github.kittinunf.fuel:fuel-gson:2.3.1")
+    implementation("com.google.code.gson:gson:2.9.1")
+
 }

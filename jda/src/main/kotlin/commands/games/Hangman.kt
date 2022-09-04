@@ -9,6 +9,8 @@ import net.dv8tion.jda.api.interactions.InteractionHook
 import net.dv8tion.jda.api.interactions.commands.build.Commands
 import java.io.File
 import java.text.Normalizer
+import java.util.*
+import kotlin.collections.ArrayList
 
 object Hangman {
     val commandData = Commands.slash("pendu", "Jouer au pendu")
@@ -35,7 +37,7 @@ object Hangman {
             if (hook.interaction.user != event.author) return
             if (hook.interaction.messageChannel.idLong != event.channel.idLong) return
 
-            val guess = normalize(event.message.contentRaw)
+            val guess = normalize(event.message.contentRaw).lowercase(Locale.getDefault())
             event.message.delete().queue()
 
             if (guess in errors) return
