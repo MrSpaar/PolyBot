@@ -1,4 +1,8 @@
-import commands.*
+import commands.Config
+import commands.games.Games
+import commands.info.Info
+import commands.moderation.Moderation
+import commands.utility.Utility
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.JDABuilder
 import net.dv8tion.jda.api.OnlineStatus

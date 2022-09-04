@@ -2,12 +2,16 @@ import io.github.cdimascio.dotenv.dotenv
 import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.OnlineStatus
 import net.dv8tion.jda.api.Permission
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.interactions.commands.SlashCommandInteraction
 
 object Vars {
     private val dotenv = dotenv()
     val DISCORD_TOKEN = dotenv["DISCORD_TOKEN"]!!
     val DB_URI = dotenv["DB_URI"]!!
+    val WEATHER_TOKEN = dotenv["WEATHER_TOKEN"]!!
+    val TWITCH_CLIENT = dotenv["TWITCH_CLIENT"]!!
+    val TWITCH_TOKEN = dotenv["TWITCH_TOKEN"]!!
 }
 
 object Colors {
@@ -74,6 +78,18 @@ object Translate {
         OnlineStatus.INVISIBLE to "Invisible",
         OnlineStatus.UNKNOWN to "Inconnu"
     )
+}
+
+fun checkPermissions(event: SlashCommandInteractionEvent, self: Boolean, vararg permissions: Permission): Boolean {
+    val member = if (self) event.guild!!.selfMember else event.member!!
+    val desc = if (self) "Je n'ai" else "Tu n'as"
+
+    if (!member.hasPermission(*permissions)) {
+        replyEmbed(event.interaction, Colors.RED, "❌ $desc la permission de faire ça", true)
+        return true
+    }
+
+    return false
 }
 
 fun replyEmbed(interaction: SlashCommandInteraction, color: Int, description: String, ephemeral: Boolean = false) {

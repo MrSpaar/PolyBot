@@ -2,6 +2,7 @@ package commands
 
 import Colors
 import Server
+import checkPermissions
 import updateConfig
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.Permission
@@ -34,11 +35,7 @@ class Config: ListenerAdapter() {
 
     override fun onSlashCommandInteraction(event: SlashCommandInteractionEvent) {
         if (event.name != "config" || event.guild == null) return
-
-        if (!event.member!!.hasPermission(Permission.ADMINISTRATOR)) {
-            replyEmbed(event.interaction, Colors.RED, "❌ Tu n'as pas la permission d'utiliser cette commande", true)
-            return
-        }
+        if (checkPermissions(event, false, Permission.ADMINISTRATOR)) return
 
         val guildId = event.guild!!.idLong
         val param = event.getOption("parametre")!!.asString
