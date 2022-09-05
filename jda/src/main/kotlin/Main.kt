@@ -1,9 +1,12 @@
 import commands.Config
 import commands.games.Games
 import commands.info.Info
+import commands.levels.Levels
 import commands.moderation.Moderation
 import commands.search.Search
 import commands.utility.Utility
+import events.levels.Pages
+import events.levels.Xp
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.JDABuilder
 import net.dv8tion.jda.api.OnlineStatus
@@ -25,13 +28,18 @@ fun main() {
         .enableCache(
             CacheFlag.ACTIVITY,
             CacheFlag.ONLINE_STATUS,
-            CacheFlag.ROLE_TAGS
+            CacheFlag.ROLE_TAGS,
         )
         .build()
 
+    addListeners(jda)
     buildCommands(jda)
     println("Bot is ready !")
     Signal.handle(Signal("INT")) { jda.shutdown() }
+}
+
+fun addListeners(jda: JDA) {
+    jda.addEventListener(Pages(), Xp())
 }
 
 fun buildCommands(jda: JDA) {
@@ -39,6 +47,7 @@ fun buildCommands(jda: JDA) {
         this.add(Config.build(jda))
         this.add(Info.build(jda))
         this.add(Search.build(jda))
+        this.addAll(Levels.build(jda))
         this.addAll(Games.build(jda))
         this.addAll(Moderation.build(jda))
         this.addAll(Utility.build(jda))

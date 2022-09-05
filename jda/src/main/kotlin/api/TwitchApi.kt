@@ -1,3 +1,5 @@
+@file:Suppress("ArrayInDataClass")
+
 package api
 
 data class TwitchObj(

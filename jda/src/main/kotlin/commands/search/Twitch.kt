@@ -25,10 +25,8 @@ object Twitch {
     private var accessToken = ""
 
     fun execute(event: SlashCommandInteractionEvent) {
-        if (accessToken == "" || expireIn.isBefore(Instant.now())) {
+        if (accessToken == "" || expireIn.isBefore(Instant.now()))
             updateToken()
-
-        }
 
         val category = event.getOption("categorie")!!.asString
         val filters = event.getOption("filtres")?.asString?.split(" ")

@@ -1,9 +1,10 @@
 package commands
 
 import Colors
-import Server
+import replyEmbed
 import checkPermissions
-import updateConfig
+import database.Database
+import database.Settings
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
@@ -12,7 +13,6 @@ import net.dv8tion.jda.api.interactions.commands.OptionType
 import net.dv8tion.jda.api.interactions.commands.build.Commands
 import net.dv8tion.jda.api.interactions.commands.build.OptionData
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData
-import replyEmbed
 
 class Config: ListenerAdapter() {
     companion object {
@@ -45,11 +45,11 @@ class Config: ListenerAdapter() {
         val channel = event.getOption("role")?.asChannel?.idLong ?: 0
 
         when (param) {
-            "logs" -> updateConfig(guildId, Server::logsChannelId, channel)
-            "newcomer" -> updateConfig(guildId, Server::newcomerRoleId, role)
-            "welcomeText" -> updateConfig(guildId, Server::welcomeText, message)
-            "announce" -> updateConfig(guildId, Server::announceChannelId, channel)
-            "welcomeChannel"  -> updateConfig(guildId, Server::announceChannelId, channel)
+            "logs" -> Database.updateConfig(guildId, Settings::logsChannelId, channel)
+            "newcomer" -> Database.updateConfig(guildId, Settings::newcomerRoleId, role)
+            "welcomeText" -> Database.updateConfig(guildId, Settings::welcomeText, message)
+            "announce" -> Database.updateConfig(guildId, Settings::announceChannelId, channel)
+            "welcomeChannel"  -> Database.updateConfig(guildId, Settings::announceChannelId, channel)
         }
 
         replyEmbed(event.interaction, Colors.GREEN, "✒️ Paramètre modifié avec succès")

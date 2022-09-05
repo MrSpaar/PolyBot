@@ -1,16 +1,13 @@
+@file:Suppress("ArrayInDataClass")
 package api
-
-import com.google.gson.annotations.SerializedName
 
 data class WeatherObj(
     val list: Array<Cast>,
 )
 
 data class Cast (
-    val dt: Int,
     val main: Main,
     val wind: Wind,
-    val rain: Rain,
     val weather: Array<Weather>,
 )
 
@@ -28,8 +25,4 @@ data class Weather(
 
 data class Wind(
     val speed: Double,
-)
-
-data class Rain(
-    @SerializedName(value = "1h") val _1h: Int,
 )

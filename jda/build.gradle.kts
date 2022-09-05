@@ -27,5 +27,4 @@ dependencies {
     implementation("com.github.kittinunf.fuel:fuel:2.3.1")
     implementation("com.github.kittinunf.fuel:fuel-gson:2.3.1")
     implementation("com.google.code.gson:gson:2.9.1")
-
 }
