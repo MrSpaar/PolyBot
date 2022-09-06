@@ -6,6 +6,8 @@ import commands.moderation.Moderation
 import commands.search.Search
 import commands.utility.Utility
 import events.Logs
+import events.channels.CreateChannel
+import events.channels.DeleteChannel
 import events.levels.Pages
 import events.levels.Xp
 import net.dv8tion.jda.api.JDA
@@ -40,7 +42,7 @@ fun main() {
 }
 
 fun addListeners(jda: JDA) {
-    jda.addEventListener(Pages(), Xp(), Logs())
+    jda.addEventListener(Pages(), Xp(), Logs(), CreateChannel(), DeleteChannel())
 }
 
 fun buildCommands(jda: JDA) {
