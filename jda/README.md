@@ -30,13 +30,14 @@ Deux possibilités pour lancer le bot (à partir de la racine du projet) :
 ### • 📈 [Système d'expérience](./src/main/kotlin/events/levels)
 
 Le système a la **même courbe d'xp que [Mee6](https://mee6.xyz/)**. <br>
-Ecrivez `/config annonce #channel` pour définir le salon où seront envoyées les annonces de level up.<br>
-`/rang` vous montrera votre niveau et votre progression vers le prochain niveau<br>
-`/classement` vous montrera le classement du serveur par pages de 10.
+Il est possible d'envoyer des messages de level up avec `/config`.
+- `/rang` vous montrera votre niveau et votre progression vers le prochain niveau<br>
+- `/classement` vous montrera le classement du serveur par pages de 10.
 
 ### • 📝 [Logs](./src/main/kotlin/events/Logs.kt)
 
-Ecrivez `/config logs #channel` pour définir le channel contenant les logs.
+Ce module permet d'envoyer automatiquement des messages de bienvenue.<br>
+Utilisez `/config` pour choisir le salon et le message de bienvenue, chaque `<mention>` sera remplacé par le nouveau membre.
 
 | Log                        | Informations affichées                                  |
 |----------------------------|---------------------------------------------------------|
