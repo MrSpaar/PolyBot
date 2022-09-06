@@ -65,6 +65,7 @@ class Logs: ListenerAdapter() {
 
     override fun onGuildMemberJoin(event: GuildMemberJoinEvent) {
         if (event.user.isBot) return
+        Database.insertMember(event.guild.idLong, event.user.idLong)
 
         val settings = Database.cache[event.guild.idLong] ?: return
 
@@ -88,6 +89,7 @@ class Logs: ListenerAdapter() {
 
     override fun onGuildMemberRemove(event: GuildMemberRemoveEvent) {
         if (event.user.isBot) return
+        Database.deleteMember(event.guild.idLong, event.user.idLong)
 
         val channel = Database.getLogsChannel(event.guild) ?: return
 

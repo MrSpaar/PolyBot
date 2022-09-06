@@ -33,3 +33,16 @@ Le système a la **même courbe d'xp que [Mee6](https://mee6.xyz/)**. <br>
 Ecrivez `/config annonce #channel` pour définir le salon où seront envoyées les annonces de level up.<br>
 `/rang` vous montrera votre niveau et votre progression vers le prochain niveau<br>
 `/classement` vous montrera le classement du serveur par pages de 10.
+
+### • 📝 [Logs](./src/main/kotlin/events/Logs.kt)
+
+Ecrivez `/config logs #channel` pour définir le channel contenant les logs.
+
+| Log                        | Informations affichées                                  |
+|----------------------------|---------------------------------------------------------|
+| Nouveau membre             | Mention                                                 |
+| Départ d'un membre         | Pseudo, ID et raison (ban, kick, ...)                   |
+| Membre unban               | Pseudo, par qui et raison                               |
+| Changement de surnom       | Ancien et nouveau surnom et par qui                     |
+| Ajout/Suppression de rôles | Rôle ajouté ou enlevé, de qui et par qui                |
+| Création d'invitation      | Lien, autheur, date d'expiration, nombre d'utilisations |

@@ -37,8 +37,17 @@ object Database {
             ?.guilds?.first { it.id == guildId }
     }
 
-    fun deleteMember(memberId: Long) {
-        database.getCollection<Member>("members").deleteOneById(memberId)
+    fun insertMember(guildId: Long, memberId: Long) {
+        database.getCollection<Member>("members").insertOne(
+            Member(memberId, arrayListOf(Server(guildId, 0, 0)))
+        )
+    }
+
+    fun deleteMember(guildId: Long, memberId: Long) {
+        database.getCollection<Member>("members").updateOneById(
+            memberId,
+            pullByFilter(Member::guilds, Server::id eq guildId)
+        )
     }
 
     fun updateMember(guildId: Long, memberId: Long, amount: Int, levelUp: Int) {
