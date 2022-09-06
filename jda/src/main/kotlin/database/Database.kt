@@ -12,7 +12,7 @@ object Database {
     private val client = KMongo.createClient(Vars.DB_URI)
     private val database = client.getDatabase("data")
 
-    private val cache = HashMap<Long, Settings>().apply {
+    val cache = HashMap<Long, Settings>().apply {
         database.getCollection<Settings>("setup").find().forEach{
             this[it._id] = it
         }
@@ -25,6 +25,10 @@ object Database {
 
     fun getAnnounceChannel(guild: Guild): TextChannel? {
         return guild.getTextChannelById(cache[guild.idLong]!!.announceChannelId)
+    }
+
+    fun getLogsChannel(guild: Guild): TextChannel? {
+        return guild.getTextChannelById(cache[guild.idLong]!!.logsChannelId)
     }
 
     fun findMember(guildId: Long, memberId: Long): Server? {

@@ -42,7 +42,7 @@ class Config: ListenerAdapter() {
 
         val message = event.getOption("message")?.asString ?: ""
         val role = event.getOption("role")?.asRole?.idLong ?: 0
-        val channel = event.getOption("role")?.asChannel?.idLong ?: 0
+        val channel = event.getOption("salon")?.asChannel?.idLong ?: 0
 
         when (param) {
             "logs" -> Database.updateConfig(guildId, Settings::logsChannelId, channel)
