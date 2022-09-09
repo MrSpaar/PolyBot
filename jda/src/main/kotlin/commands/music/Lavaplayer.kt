@@ -94,12 +94,12 @@ class ResultHandler(private val manager: Manager, private val interaction: Slash
             else if (!search)
                 manager.queue.addAll(playlist.tracks)
 
-            if (this) manager.createMessage(playlist.tracks[0])
+            if (this)
+                manager.createMessage(playlist.tracks[0])
             else {
                 manager.createMessage(init = false)
                 replyEmbed(interaction, Colors.GREEN, "✅ Vidéos ajoutées", true)
             }
-
         }
     }
 
