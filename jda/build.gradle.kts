@@ -17,10 +17,12 @@ tasks.withType<KotlinCompile>().all {
 
 repositories {
     mavenCentral()
+    maven("https://m2.dv8tion.net/releases")
 }
 
 dependencies {
     implementation("net.dv8tion:JDA:5.0.0-alpha.18")
+    implementation("com.sedmelluq:lavaplayer:1.3.77")
     implementation("io.github.cdimascio:dotenv-kotlin:6.3.1")
     implementation("org.litote.kmongo:kmongo:4.7.0")
     implementation("org.apache.logging.log4j:log4j-slf4j-impl:2.18.0")

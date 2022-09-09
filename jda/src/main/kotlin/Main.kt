@@ -3,6 +3,7 @@ import commands.games.Games
 import commands.info.Info
 import commands.levels.Levels
 import commands.moderation.Moderation
+import commands.music.Music
 import commands.search.Search
 import commands.utility.Utility
 import events.Logs
@@ -50,6 +51,7 @@ fun buildCommands(jda: JDA) {
         this.add(Config.build(jda))
         this.add(Info.build(jda))
         this.add(Search.build(jda))
+        this.addAll(Music.build(jda))
         this.addAll(Levels.build(jda))
         this.addAll(Games.build(jda))
         this.addAll(Moderation.build(jda))
