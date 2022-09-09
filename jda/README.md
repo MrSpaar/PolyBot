@@ -11,6 +11,7 @@ Deux possibilités pour lancer le bot (à partir de la racine du projet) :
 
 | Categorie                                      | Commandes                            |
 |------------------------------------------------|--------------------------------------|
+| [Musique](./src/main/kotlin/commands/music)    | `play` `skip`                        |
 | [Jeux](./src/main/kotlin/commands/games)       | `coinflip` `pendu` `roll`            |
 | [Niveaux](./src/main/kotlin/commands/levels)   | `rang` `classement`                  |
 | [Recherche](./src/main/kotlin/commands/search) | `twitch` `anime` `wikipedia` `meteo` |
