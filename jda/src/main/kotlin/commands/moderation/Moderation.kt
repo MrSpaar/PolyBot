@@ -15,7 +15,7 @@ class Moderation: ListenerAdapter() {
     }
 
     override fun onSlashCommandInteraction(event: SlashCommandInteractionEvent) {
-        if (event.guild == null) return
+        if (!event.isFromGuild) return
 
         when (event.name) {
             "clear" -> Clear.execute(event)
