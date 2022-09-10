@@ -17,7 +17,7 @@ object Emoji {
         val id = arg.replace("\\D+".toRegex(), "")
 
         if (id == "")
-            return replyEmbed(event.interaction, Colors.RED, "❌ Emoji custom invalide")
+            return replyEmbed(event.interaction, Colors.RED, "❌ Emoji custom invalide", true)
 
         val emoji = event.jda.getEmojiById(id)
             ?: return replyEmbed(event.interaction, Colors.RED, "❌ Emoji introuvable", true)

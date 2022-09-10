@@ -20,7 +20,7 @@ object Poll {
 
         val embed = EmbedBuilder().setTitle(">> $question")
             .setColor(Colors.BLUE)
-            .setAuthor("Sondage de $name", "", event.user.avatarUrl)
+            .setAuthor("Sondage de $name", null, event.user.avatarUrl)
 
         val reactions = arrayOf("1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣")
 
