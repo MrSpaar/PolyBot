@@ -33,7 +33,7 @@ class Pages: ListenerAdapter() {
         entries.subList(nextPage*10-9, nextPage*10).forEach {
             val entry = it.guilds[0]
 
-            names += event.member!!.effectiveName + "\n"
+            names += event.guild.getMemberById(it._id)?.effectiveName + "\n"
             levels += entry.toSummary() + "\n"
             progress += entry.toProgressBar(5) + "\n"
         }
