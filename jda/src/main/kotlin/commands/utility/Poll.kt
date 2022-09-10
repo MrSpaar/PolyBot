@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionType
 import net.dv8tion.jda.api.interactions.commands.build.Commands
 import net.dv8tion.jda.api.interactions.commands.build.OptionData
+import replyEmbed
 
 object Poll {
     val commandData = Commands.slash("sondage", "Faire un sondage (35 choix maximum)").addOptions(
@@ -17,6 +18,7 @@ object Poll {
         val name = event.member?.effectiveName ?: event.user.name
         val question = event.getOption("question")!!.asString
         val choices = event.getOption("choix")!!.asString.split("|")
+        if(choices.size > 35) return replyEmbed(event.interaction, Colors.RED, "❌ Le nombre de réponses possibles ne peut excéder 35.", true)
 
         val embed = EmbedBuilder().setTitle(">> $question")
             .setColor(Colors.BLUE)
