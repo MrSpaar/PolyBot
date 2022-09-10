@@ -53,13 +53,13 @@ fun addListeners(jda: JDA) {
 fun buildCommands(jda: JDA) {
     val globalCommands = arrayListOf<SlashCommandData>().apply {
         this.add(Search.build(jda))
-        this.addAll(Games.build(jda))
         this.addAll(Utility.build(jda))
     }
 
     val serverCommands = arrayListOf<SlashCommandData>().apply {
         this.add(Config.build(jda))
         this.add(Info.build(jda))
+        this.addAll(Games.build(jda))
         this.addAll(Music.build(jda))
         this.addAll(Levels.build(jda))
         this.addAll(Moderation.build(jda))
