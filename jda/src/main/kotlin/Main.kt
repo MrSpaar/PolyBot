@@ -47,16 +47,22 @@ fun addListeners(jda: JDA) {
 }
 
 fun buildCommands(jda: JDA) {
-    val commands = arrayListOf<SlashCommandData>().apply {
-        this.add(Config.build(jda))
-        this.add(Info.build(jda))
+    val globalCommands = arrayListOf<SlashCommandData>().apply {
         this.add(Search.build(jda))
-        this.addAll(Music.build(jda))
-        this.addAll(Levels.build(jda))
         this.addAll(Games.build(jda))
-        this.addAll(Moderation.build(jda))
         this.addAll(Utility.build(jda))
     }
 
-    jda.awaitReady().getGuildById(1013076480961560628L)!!.updateCommands().addCommands(commands).queue()
+    val serverCommands = arrayListOf<SlashCommandData>().apply {
+        this.add(Config.build(jda))
+        this.add(Info.build(jda))
+        this.addAll(Music.build(jda))
+        this.addAll(Levels.build(jda))
+        this.addAll(Moderation.build(jda))
+    }
+
+    jda.awaitReady().updateCommands().addCommands(globalCommands).queue()
+    arrayOf(752921557214429316L, 339045627478540288L, 634339847108165632L).forEach {
+        jda.awaitReady().getGuildById(it)!!.updateCommands().addCommands(serverCommands).queue()
+    }
 }
