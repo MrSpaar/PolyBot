@@ -17,6 +17,7 @@ import net.dv8tion.jda.api.OnlineStatus
 import net.dv8tion.jda.api.entities.Activity
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData
 import net.dv8tion.jda.api.requests.GatewayIntent
+import net.dv8tion.jda.api.utils.MemberCachePolicy
 import net.dv8tion.jda.api.utils.cache.CacheFlag
 import sun.misc.Signal
 
@@ -32,7 +33,10 @@ fun main() {
         .enableCache(
             CacheFlag.ACTIVITY,
             CacheFlag.ONLINE_STATUS,
-            CacheFlag.ROLE_TAGS,
+            CacheFlag.ROLE_TAGS
+        )
+        .setMemberCachePolicy(
+            MemberCachePolicy.ALL
         )
         .build()
 
