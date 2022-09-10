@@ -10,7 +10,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData
 import replyEmbed
 
 object Poll {
-    val commandData = Commands.slash("sondage", "Faire un sondage (25 choix maximum)").addOptions(
+    val commandData = Commands.slash("sondage", "Faire un sondage (26 choix maximum)").addOptions(
         OptionData(OptionType.STRING, "question", "La question du sondage", true),
         OptionData(OptionType.STRING, "choix", "Les choix du sondage (Choix 1 | Choix 2 | ...)", true)
     )
@@ -21,7 +21,7 @@ object Poll {
         val choices = event.getOption("choix")!!.asString.split("|")
 
         if(choices.size > 26)
-            return replyEmbed(event.interaction, Colors.RED, "❌ Le nombre de choix est limité à 25", true)
+            return replyEmbed(event.interaction, Colors.RED, "❌ Le nombre de choix est limité à 26", true)
 
         var description = "> **$question**\n\n"
         val reactions = arrayOf("🇦", "🇧", "🇨", "🇩", "🇪", "🇫", "🇬", "🇭", "🇮", "🇯", "🇰", "🇱", "🇲", "🇳", "🇴", "🇵", "🇶", "🇷", "🇸", "🇹", "🇺", "🇻", "🇼", "🇽", "🇾", "🇿")
