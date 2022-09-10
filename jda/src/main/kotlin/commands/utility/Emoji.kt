@@ -1,5 +1,6 @@
 package commands.utility
 
+import Colors
 import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.interactions.commands.OptionType
@@ -13,12 +14,13 @@ object Emoji {
 
     fun execute(event: SlashCommandInteractionEvent) {
         val arg = event.getOption("emoji")!!.asString
-        val emoji = event.jda.getEmojiById(arg.replace("\\D+".toRegex(), ""))
+        val id = arg.replace("\\D+".toRegex(), "")
 
-        if (emoji == null) {
-            replyEmbed(event.interaction, Colors.RED, "❌ Emoji introuvable", true)
-            return
-        }
+        if (id == "")
+            return replyEmbed(event.interaction, Colors.RED, "❌ Emoji custom invalide")
+
+        val emoji = event.jda.getEmojiById(id)
+            ?: return replyEmbed(event.interaction, Colors.RED, "❌ Emoji introuvable", true)
 
         event.interaction.replyEmbeds(
             EmbedBuilder().setColor(Colors.BLUE).setImage(emoji.imageUrl).build()
