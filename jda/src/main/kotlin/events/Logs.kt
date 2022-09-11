@@ -81,7 +81,7 @@ class Logs: ListenerAdapter() {
             this.sendMessageEmbeds(
                 EmbedBuilder()
                     .setColor(Colors.GREEN)
-                    .setDescription(":outbox_tray: ${event.user.asMention} a rejoint le serveur")
+                    .setDescription(":inbox_tray: ${event.user.asMention} a rejoint le serveur")
                     .build()
             ).queue()
         }
@@ -96,7 +96,7 @@ class Logs: ListenerAdapter() {
         channel.sendMessageEmbeds(
             EmbedBuilder()
                 .setColor(Colors.RED)
-                .setDescription("outbox_tray: ${event.user.asMention} a quitté le serveur")
+                .setDescription(":outbox_tray: ${event.user.asMention} a quitté le serveur")
                 .build()
         ).queue()
     }
