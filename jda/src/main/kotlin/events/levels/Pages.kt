@@ -11,7 +11,7 @@ class Pages: ListenerAdapter() {
     override fun onMessageReactionAdd(event: MessageReactionAddEvent) {
         if (event.member == null || event.user!!.isBot) return
 
-        val emoji = event.emoji.asUnicode().name
+        val emoji = event.emoji.name
         if (emoji != "◀️" && emoji != "▶️") return
 
         val message = event.retrieveMessage().complete()
