@@ -1,4 +1,5 @@
 .env
 .idea/
 .gradle/
+build/
 __pycache__/
