@@ -70,11 +70,11 @@ class Logs: ListenerAdapter() {
         val settings = Database.cache[event.guild.idLong] ?: return
 
         event.guild.getRoleById(settings.newcomerRoleId)?.apply {
-            event.guild.addRoleToMember(event.user, this)
+            event.guild.addRoleToMember(event.user, this).queue()
         }
 
         event.guild.getTextChannelById(settings.welcomeChannelId)?.apply {
-            this.sendMessage(settings.welcomeText.replace("<mention>", event.user.asMention))
+            this.sendMessage(settings.welcomeText.replace("<mention>", event.user.asMention)).queue()
         }
 
         event.guild.getTextChannelById(settings.logsChannelId)?.apply {
