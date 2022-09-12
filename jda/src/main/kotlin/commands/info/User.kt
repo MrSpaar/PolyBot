@@ -18,7 +18,9 @@ object User {
 
         var description = "\uD83D\uDCDD A créé son compte <t:${member.timeCreated.toEpochSecond()}:R>\n"
         description += "⏱️ A rejoint le serveur <t:${member.timeJoined.toEpochSecond()}:R>\n"
-        description += "\uD83C\uDFF7️ Rôle principal : ${member.roles.last().asMention}\n"
+
+        if (member.roles.isNotEmpty())
+            description += "\uD83C\uDFF7️ Rôle principal : ${member.roles.last().asMention}\n"
 
         if (member.activities.isNotEmpty()) {
             description += "\n\uD83C\uDFC3\u200D♂️ Activités :\n"
