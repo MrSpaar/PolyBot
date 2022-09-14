@@ -54,22 +54,18 @@ object Database {
         return guild
     }
 
-    fun findTempChannel(guildId: Long, memberId: Long): Channel? {
-        return database.getCollection<Channel>("pending").find(
-            and(Channel::guildId eq guildId, Channel::memberId eq memberId)
-        ).first()
+    fun findTempChannel(vocId: Long): Channel? {
+        return database.getCollection<Channel>("pending").findOneById(vocId)
     }
 
     fun insertTempChannel(memberId: Long, guildId: Long, txtId: Long, vocId: Long) {
         database.getCollection<Channel>("pending").insertOne(
-            Channel(memberId, guildId, txtId, vocId)
+            Channel(vocId, guildId, memberId, txtId)
         )
     }
 
-    fun deleteTempChannel(guildId: Long, memberId: Long) {
-        database.getCollection<Channel>("pending").deleteOne(
-            and(Channel::guildId eq guildId, Channel::memberId eq memberId)
-        )
+    fun deleteTempChannel(vocId: Long) {
+        database.getCollection<Channel>("pending").deleteOneById(vocId)
     }
 
     fun deleteMember(guildId: Long, memberId: Long) {

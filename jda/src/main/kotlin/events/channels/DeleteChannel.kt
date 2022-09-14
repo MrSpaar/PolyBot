@@ -8,11 +8,11 @@ class DeleteChannel: ListenerAdapter() {
     override fun onGuildVoiceLeave(event: GuildVoiceLeaveEvent) {
         if (event.channelLeft.members.size > 0) return
 
-        val entry = Database.findTempChannel(event.guild.idLong, event.member.idLong) ?: return
+        val entry = Database.findTempChannel(event.channelLeft.idLong) ?: return
 
         event.guild.getTextChannelById(entry.txtId)?.delete()?.queue()
         event.guild.getVoiceChannelById(entry._id)?.delete()?.queue()
 
-        Database.deleteTempChannel(event.member.idLong, event.member.idLong)
+        Database.deleteTempChannel(entry._id)
     }
 }
