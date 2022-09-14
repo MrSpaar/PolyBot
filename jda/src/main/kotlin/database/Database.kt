@@ -37,10 +37,11 @@ object Database {
             ?.guilds?.first { it.id == guildId }
     }
 
-    fun insertMember(guildId: Long, memberId: Long) {
-        database.getCollection<Member>("members").insertOne(
-            Member(memberId, arrayListOf(Server(guildId, 0, 0)))
-        )
+    fun insertMember(guildId: Long, memberId: Long): Server {
+        val member = Member(memberId, arrayListOf(Server(guildId, 0, 0)))
+
+        database.getCollection<Member>("members").insertOne(member)
+        return member.guilds[0]
     }
 
     fun findTempChannel(guildId: Long, memberId: Long): Channel? {
