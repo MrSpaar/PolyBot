@@ -44,6 +44,16 @@ object Database {
         return member.guilds[0]
     }
 
+    fun updateMember(guildId: Long, memberId: Long): Server {
+        val guild = Server(guildId, 0, 0)
+
+        database.getCollection<Member>("members").updateOneById(
+            memberId, addToSet(Member::guilds, guild), upsert()
+        )
+
+        return guild
+    }
+
     fun findTempChannel(guildId: Long, memberId: Long): Channel? {
         return database.getCollection<Channel>("pending").find(
             and(Channel::guildId eq guildId, Channel::memberId eq memberId)

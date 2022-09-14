@@ -17,7 +17,7 @@ class Xp: ListenerAdapter() {
         if (member.isCooling(event.guild.idLong)) return
 
         val entry = Database.findMember(event.guild.idLong, member.idLong)
-            ?: Database.insertMember(event.guild.idLong, member.idLong)
+            ?: Database.updateMember(event.guild.idLong, member.idLong)
 
         val nextLevel = entry.level + 1
         val amount = Random.nextInt(15, 26)
