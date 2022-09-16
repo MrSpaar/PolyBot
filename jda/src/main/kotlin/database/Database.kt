@@ -37,13 +37,6 @@ object Database {
             ?.guilds?.first { it.id == guildId }
     }
 
-    fun insertMember(guildId: Long, memberId: Long): Server {
-        val member = Member(memberId, arrayListOf(Server(guildId, 0, 0)))
-
-        database.getCollection<Member>("members").insertOne(member)
-        return member.guilds[0]
-    }
-
     fun updateMember(guildId: Long, memberId: Long): Server {
         val guild = Server(guildId, 0, 0)
 
