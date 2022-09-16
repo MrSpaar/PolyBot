@@ -44,15 +44,10 @@ object Twitch {
                     .setColor(Colors.BLUE)
                     .setAuthor("Twitch - ${data.data[0].game_name}", null, "https://i.imgur.com/gArdgyC.png")
 
-                if (filters == null)
-                    data.data.forEach {
+                data.data.forEach {
+                    if (filters == null || filters.any { filt -> filt.lowercase() in it.title.lowercase() })
                         embed.addField(it.display_name, "[${it.title}](https://www.twitch.tv/${it.broadcaster_login})", true)
-                    }
-                else
-                    data.data.forEach pass@{
-                        if (filters.any{ key -> key in it.title })
-                            embed.addField(it.display_name, "[${it.title}](https://www.twitch.tv/${it.broadcaster_login})", true)
-                    }
+                }
 
                 event.interaction.replyEmbeds(embed.build()).queue()
             }
