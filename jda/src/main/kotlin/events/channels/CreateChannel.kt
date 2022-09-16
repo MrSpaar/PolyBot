@@ -8,7 +8,7 @@ class CreateChannel: ListenerAdapter() {
     override fun onGuildVoiceJoin(event: GuildVoiceJoinEvent) {
         if ("Créer" !in  event.channelJoined.name) return
 
-        val entry = Database.findTempChannel(event.guild.idLong, event.member.idLong)
+        val entry = Database.findTempChannel(event.channelJoined.idLong)
         if (entry != null) return
 
         val name = "Salon de ${event.member.effectiveName}"
