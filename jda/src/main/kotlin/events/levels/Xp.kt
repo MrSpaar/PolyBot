@@ -11,7 +11,7 @@ import kotlin.random.Random
 
 class Xp: ListenerAdapter() {
     override fun onMessageReceived(event: MessageReceivedEvent) {
-        if (event.member == null) return
+        if (event.member == null || event.author.isBot) return
         val member = event.member!!
 
         if (member.isCooling(event.guild.idLong)) return
