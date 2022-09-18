@@ -33,8 +33,11 @@ object Database {
 
     fun findMember(guildId: Long, memberId: Long): Server? {
         return database.getCollection<Member>("members")
-            .findOneById(memberId)
-            ?.guilds?.first { it.id == guildId }
+            .find(
+                and(Member::_id eq memberId, (Member::guilds/Server::id) eq guildId),
+            )
+            .projection(Member::guilds.posOp)
+            .first()?.guilds?.get(0)
     }
 
     fun updateMember(guildId: Long, memberId: Long): Server {
