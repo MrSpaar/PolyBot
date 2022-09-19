@@ -17,7 +17,7 @@ class CreateChannel: ListenerAdapter() {
         event.guild.createVoiceChannel(name).setParent(category).queue { voc ->
             event.guild.createTextChannel(name).setParent(category).queue { txt ->
                 event.guild.moveVoiceMember(event.member, voc).queue()
-                Database.insertTempChannel(voc.idLong, event.guild.idLong, event.member.idLong, txt.idLong)
+                Database.insertTempChannel(event.member.idLong, event.guild.idLong, txt.idLong, voc.idLong)
             }
         }
     }
