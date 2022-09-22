@@ -22,6 +22,7 @@ Deux possibilités pour lancer le bot (à partir de la racine du projet) :
 
 | Categorie                                         | Commandes                              |
 |---------------------------------------------------|----------------------------------------|
+| [Menus](./src/main/java/commands/menu)            | `liste` `boutons` `emojis`             |
 | [Modération](./src/main/java/commands/moderation) | `clear` `kick` `ban` `unban`           |
 | [Configuration](./src/main/java/commands/setup)   | `logs` `bienvenue` `nouveau` `annonce` |
 

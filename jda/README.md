@@ -9,19 +9,20 @@ Deux possibilités pour lancer le bot (à partir de la racine du projet) :
 
 ### • 🧍 Commandes utilisateur
 
-| Categorie                                      | Commandes                            |
-|------------------------------------------------|--------------------------------------|
-| [Musique](./src/main/kotlin/commands/music)    | `play` `skip`                        |
-| [Jeux](./src/main/kotlin/commands/games)       | `coinflip` `pendu` `roll`            |
-| [Niveaux](./src/main/kotlin/commands/levels)   | `rang` `classement`                  |
-| [Recherche](./src/main/kotlin/commands/search) | `twitch` `anime` `wikipedia` `meteo` |
-| [Divers](./src/main/kotlin/commands/utility)   | `sondage` `pfp` `emoji`              |
-| [Infos](./src/main/kotlin/commands/info)       | `serveur` `membre` `role`            |
+| Categorie                                      | Commandes                                            |
+|------------------------------------------------|------------------------------------------------------|
+| [Musique](./src/main/kotlin/commands/music)    | `play` `skip`                                        |
+| [Jeux](./src/main/kotlin/commands/games)       | `coinflip` `pendu` `roll`                            |
+| [Niveaux](./src/main/kotlin/commands/levels)   | `rang` `classement`                                  |
+| [Recherche](./src/main/kotlin/commands/search) | `api twitch` `api anime` `api wikipedia` `api meteo` |
+| [Divers](./src/main/kotlin/commands/utility)   | `sondage` `pfp` `emoji`                              |
+| [Infos](./src/main/kotlin/commands/info)       | `info serveur` `info membre` `info role`             |
 
 ### • 🔒 Commandes admin
 
 | Categorie                                             | Commandes                              |
 |-------------------------------------------------------|----------------------------------------|
+| [Menus](./src/main/kotlin/commands/menu)              | `menu liste` `menu boutons`            |
 | [Modération](./src/main/kotlin/commands/moderation)   | `clear` `kick` `ban` `unban`           |
 | [Configuration](./src/main/kotlin/commands/Config.kt) | `logs` `bienvenue` `nouveau` `annonce` |
 
@@ -43,6 +44,11 @@ Ce module permet d'avoir des channels vocaux temporaires :
 - Un channel écrit est généré et lié avec le channel temporaire.
 - Les deux sont supprimés dès que le channel vocal est vide.
 
+### • 📌 [Menu de rôles](./src/main/kotlin/events/Roles.kt)
+
+Ce module permet de créer deux types de menu de rôles :
+- Avec des boutons, l'utilisateur peut s'ajouter n'importe quel rôle parmi la liste
+- Avec un menu déroulant, l'utilisateur ne peut choisir qu'un seul rôle parmi la liste
 
 ### • 📝 [Logs](./src/main/kotlin/events/Logs.kt)
 

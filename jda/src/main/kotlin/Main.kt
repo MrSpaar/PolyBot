@@ -2,11 +2,13 @@ import commands.Config
 import commands.games.Games
 import commands.info.Info
 import commands.levels.Levels
+import commands.menu.Menu
 import commands.moderation.Moderation
 import commands.music.Music
 import commands.search.Search
 import commands.utility.Utility
 import events.Logs
+import events.Roles
 import events.channels.CreateChannel
 import events.channels.DeleteChannel
 import events.levels.Pages
@@ -47,7 +49,7 @@ fun main() {
 }
 
 fun addListeners(jda: JDA) {
-    jda.addEventListener(Pages(), Xp(), Logs(), CreateChannel(), DeleteChannel())
+    jda.addEventListener(Pages(), Xp(), Logs(), CreateChannel(), DeleteChannel(), Roles())
 }
 
 fun buildCommands(jda: JDA) {
@@ -59,6 +61,7 @@ fun buildCommands(jda: JDA) {
     val serverCommands = arrayListOf<SlashCommandData>().apply {
         this.add(Config.build(jda))
         this.add(Info.build(jda))
+        this.add(Menu.build(jda))
         this.addAll(Games.build(jda))
         this.addAll(Music.build(jda))
         this.addAll(Levels.build(jda))
@@ -66,7 +69,8 @@ fun buildCommands(jda: JDA) {
     }
 
     jda.awaitReady().updateCommands().addCommands(globalCommands).queue()
-    arrayOf(752921557214429316L, 339045627478540288L, 634339847108165632L).forEach {
-        jda.awaitReady().getGuildById(it)!!.updateCommands().addCommands(serverCommands).queue()
+
+    jda.awaitReady().guilds.forEach {
+        it.updateCommands().addCommands(serverCommands).queue()
     }
 }
