@@ -7,12 +7,12 @@ import commands.moderation.Moderation
 import commands.music.Music
 import commands.search.Search
 import commands.utility.Utility
-import events.Logs
 import events.Roles
 import events.channels.CreateChannel
 import events.channels.DeleteChannel
 import events.levels.Pages
 import events.levels.Xp
+import events.logs.Logs
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.JDABuilder
 import net.dv8tion.jda.api.OnlineStatus
@@ -49,7 +49,9 @@ fun main() {
 }
 
 fun addListeners(jda: JDA) {
-    jda.addEventListener(Pages(), Xp(), Logs(), CreateChannel(), DeleteChannel(), Roles())
+    jda.addEventListener(
+        Pages(), Xp(), CreateChannel(), DeleteChannel(), Roles(), *Logs.listenerData
+    )
 }
 
 fun buildCommands(jda: JDA) {

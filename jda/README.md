@@ -50,16 +50,18 @@ Ce module permet de créer deux types de menu de rôles :
 - Avec des boutons, l'utilisateur peut s'ajouter n'importe quel rôle parmi la liste
 - Avec un menu déroulant, l'utilisateur ne peut choisir qu'un seul rôle parmi la liste
 
-### • 📝 [Logs](./src/main/kotlin/events/Logs.kt)
+### • 📝 [Logs](./src/main/kotlin/events/logs)
 
 Ce module permet d'envoyer automatiquement des messages de bienvenue.<br>
 Utilisez `/config` pour choisir le salon et le message de bienvenue, chaque `<mention>` sera remplacé par le nouveau membre.
 
-| Log                        | Informations affichées                                  |
-|----------------------------|---------------------------------------------------------|
-| Nouveau membre             | Mention                                                 |
-| Départ d'un membre         | Pseudo, ID et raison (ban, kick, ...)                   |
-| Membre unban               | Pseudo, par qui et raison                               |
-| Changement de surnom       | Ancien et nouveau surnom et par qui                     |
-| Ajout/Suppression de rôles | Rôle ajouté ou enlevé, de qui et par qui                |
-| Création d'invitation      | Lien, autheur, date d'expiration, nombre d'utilisations |
+| Log                                    | Informations affichées                                  |
+|----------------------------------------|---------------------------------------------------------|
+| Nouveau membre                         | Mention                                                 |
+| Départ d'un membre                     | Pseudo, ID et raison (ban, kick, ...)                   |
+| Membre unban                           | Pseudo, par qui et raison                               |
+| Changement de surnom                   | Ancien et nouveau surnom et par qui                     |
+| Ajout/Suppression de rôles à un membre | Rôle ajouté ou enlevé, de qui et par qui                |
+| Création/Suppression de rôles          | Rôle créé ou supprimé et par qui                        |
+| Modification de rôles                  | Ce qui a été modifié et par qui                         |
+| Création d'invitation                  | Lien, autheur, date d'expiration, nombre d'utilisations |
