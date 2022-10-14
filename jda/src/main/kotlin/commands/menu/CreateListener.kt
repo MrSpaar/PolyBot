@@ -36,6 +36,9 @@ class CreateListener(private val interaction: SlashCommandInteraction, private v
             }
         }
 
+        if (components.isEmpty())
+            return
+
         interaction.hook
             .editOriginal("Menu de rôles - ${interaction.getOption("titre")!!.asString}")
             .setEmbeds()
