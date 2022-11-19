@@ -1,8 +1,9 @@
 package events.levels
 
 import Colors
-import kotlin.math.min
-import database.Database
+import Database
+import kotlin.math.ceil
+import commands.levels.Levels
 import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
@@ -20,22 +21,31 @@ class Pages: ListenerAdapter() {
         val embed = message.embeds[0]
         if ("Page" !in (embed.footer?.text ?: "")) return
 
-        val entries = Database.getLeaderboard(event.guild.idLong).toList()
+        val entries = Database.getLeaderboard(event.guild.idLong)
+        val entryCount = entries.getInt("total_rows")
 
         val inc = if(emoji == "◀️") -1 else 1
-        val pageNumber = entries.size/10 + min(1, entries.size%10)
+        val pageCount = ceil(entryCount/10.0).toInt()
+
+        println(entryCount)
+        println(pageCount)
 
         val currentPage = embed.footer!!.text!!.replace("Page ", "").toInt()
-        val nextPage = ((currentPage + inc) % pageNumber).let{ if(it == 0) pageNumber else it}
+        val nextPage = minOf((currentPage+inc) % pageCount, pageCount)
 
         var (names, levels, progress) = arrayOf("", "", "")
 
-        entries.subList(nextPage*10-9, nextPage*10).forEach {
-            val entry = it.guilds[0]
+        val b = nextPage*10
+        val a = b-9
 
-            names += event.guild.getMemberById(it._id)?.effectiveName + "\n"
-            levels += entry.toSummary() + "\n"
-            progress += entry.toProgressBar(5) + "\n"
+        for (i in 0..a)
+            entries.next()
+
+        for (i in a..b) {
+            names += event.guild.getMemberById(entries.getLong("user_id"))?.effectiveName + "\n"
+            levels += "${entries.getInt("level")} (${Levels.format(entries.getInt("xp"))})\n"
+            progress += Levels.toProgressBar(entries.getInt("xp"), entries.getInt("level"), 5)
+            entries.next()
         }
 
         message.editMessageEmbeds(

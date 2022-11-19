@@ -1,15 +1,16 @@
 package events.channels
 
-import database.Database
+import Database
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceJoinEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
 
 class CreateChannel: ListenerAdapter() {
     override fun onGuildVoiceJoin(event: GuildVoiceJoinEvent) {
-        if ("Créer" !in  event.channelJoined.name) return
+        if ("Nik" !in  event.channelJoined.name) return
+        println("Yes")
 
-        val entry = Database.findTempChannel(event.channelJoined.idLong)
-        if (entry != null) return
+        val entry = Database.findTempChannel(event.guild.idLong, event.channelJoined.idLong)
+        if (entry.next()) return
 
         val name = "Salon de ${event.member.effectiveName}"
         val category = event.guild.getVoiceChannelById(event.channelJoined.id)?.parentCategory ?: return

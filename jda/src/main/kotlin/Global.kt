@@ -8,7 +8,6 @@ import net.dv8tion.jda.api.interactions.commands.SlashCommandInteraction
 object Vars {
     private val dotenv = dotenv()
     val DISCORD_TOKEN = dotenv["DISCORD_TOKEN"]!!
-    val DB_URI = dotenv["DB_URI"]!!
     val WEATHER_TOKEN = dotenv["WEATHER_TOKEN"]!!
     val TWITCH_CLIENT = dotenv["TWITCH_CLIENT"]!!
     val TWITCH_TOKEN = dotenv["TWITCH_TOKEN"]!!
@@ -84,12 +83,11 @@ fun checkPermissions(event: SlashCommandInteractionEvent, self: Boolean, vararg 
     val member = if (self) event.guild!!.selfMember else event.member!!
     val desc = if (self) "Je n'ai" else "Tu n'as"
 
-    if (!member.hasPermission(*permissions)) {
-        replyEmbed(event.interaction, Colors.RED, "❌ $desc la permission de faire ça", true)
-        return true
-    }
+    if (member.hasPermission(*permissions))
+        return false
 
-    return false
+    replyEmbed(event.interaction, Colors.RED, "❌ $desc la permission de faire ça", true)
+    return true
 }
 
 fun replyEmbed(interaction: SlashCommandInteraction, color: Int, description: String, ephemeral: Boolean = false) {

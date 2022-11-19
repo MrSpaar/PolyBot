@@ -1,6 +1,7 @@
 package events.logs
 
-import database.Database
+import Colors
+import Database
 import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.audit.ActionType
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent
@@ -11,19 +12,21 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter
 class MemberLogger: ListenerAdapter() {
     override fun onGuildMemberJoin(event: GuildMemberJoinEvent) {
         if (event.user.isBot) return
-        Database.updateMember(event.guild.idLong, event.user.idLong)
 
-        val settings = Database.cache[event.guild.idLong] ?: return
+        Database.ensureUser(event.guild.idLong, event.user.idLong)
+        val settings = Database.getSettings(event.guild.idLong)
 
-        event.guild.getRoleById(settings.newcomerRoleId)?.apply {
+        event.guild.getRoleById(settings.getLong("newcomer_role_id"))?.apply {
             event.guild.addRoleToMember(event.user, this).queue()
         }
 
-        event.guild.getTextChannelById(settings.welcomeChannelId)?.apply {
-            this.sendMessage(settings.welcomeText.replace("<mention>", event.user.asMention)).queue()
+        event.guild.getTextChannelById(settings.getLong("welcome_chan_id"))?.apply {
+            this.sendMessage(
+                settings.getString("welcome_text").replace("<mention>", event.user.asMention)
+            ).queue()
         }
 
-        event.guild.getTextChannelById(settings.logsChannelId)?.apply {
+        event.guild.getTextChannelById(settings.getLong("logs_chan_id"))?.apply {
             this.sendMessageEmbeds(
                 EmbedBuilder()
                     .setColor(Colors.GREEN)
@@ -35,23 +38,18 @@ class MemberLogger: ListenerAdapter() {
 
     override fun onGuildMemberRemove(event: GuildMemberRemoveEvent) {
         if (event.user.isBot) return
-        Database.deleteMember(event.guild.idLong, event.user.idLong)
 
         val channel = Database.getLogsChannel(event.guild) ?: return
 
-        channel.sendMessageEmbeds(
-            EmbedBuilder()
-                .setColor(Colors.RED)
-                .setDescription(":outbox_tray: ${event.user.asMention} a quitté le serveur")
-                .build()
-        ).queue()
+        Database.deleteUser(event.guild.idLong, event.user.idLong)
+        Logs.sendLog(channel, Colors.RED, ":outbox_tray: ${event.user.asMention} a quitté le serveur")
     }
 
     override fun onGuildMemberUpdateNickname(event: GuildMemberUpdateNicknameEvent) {
+        val channel = Database.getLogsChannel(event.guild) ?: return
+
         val oldNick = event.oldNickname ?: event.user.name
         val newNick = event.newNickname ?: event.member.effectiveName
-
-        val channel = Database.getLogsChannel(event.guild) ?: return
 
         event.guild.retrieveAuditLogs().type(ActionType.MEMBER_UPDATE).limit(1).queue {
             var description = "\uD83C\uDFF7️ "
@@ -61,12 +59,7 @@ class MemberLogger: ListenerAdapter() {
 
             description += "`$oldNick` → `$newNick`"
 
-            channel.sendMessageEmbeds(
-                EmbedBuilder()
-                    .setColor(Colors.BLUE)
-                    .setDescription(description)
-                    .build()
-            ).queue()
+            Logs.sendLog(channel, Colors.BLUE, description)
         }
     }
 }

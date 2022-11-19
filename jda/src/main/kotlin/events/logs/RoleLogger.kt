@@ -1,8 +1,8 @@
 package events.logs
 
 import Colors
+import Database
 import Translate
-import database.Database
 import net.dv8tion.jda.api.audit.ActionType
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRoleAddEvent
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRoleRemoveEvent
@@ -19,7 +19,7 @@ class RoleLogger: ListenerAdapter() {
 
         event.guild.retrieveAuditLogs().type(ActionType.ROLE_CREATE).limit(1).queue {
             val user = it[0].user?.asMention ?: "Discord"
-            Logs.sendLog(channel, "\uD83D\uDCCC $user a créé le rôle ${event.role.asMention}", Colors.GREEN)
+            Logs.sendLog(channel, Colors.GREEN, "\uD83D\uDCCC $user a créé le rôle ${event.role.asMention}")
         }
     }
 
@@ -30,7 +30,7 @@ class RoleLogger: ListenerAdapter() {
             val user = it[0].user?.asMention ?: "Discord"
             val update = "`${event.oldColorRaw}` → `${event.newColorRaw}`"
 
-            Logs.sendLog(channel, "\uD83C\uDF08 $user a modifié la couleur de ${event.role.asMention} ($update)", Colors.BLUE)
+            Logs.sendLog(channel, Colors.BLUE, "\uD83C\uDF08 $user a modifié la couleur de ${event.role.asMention} ($update)")
         }
     }
 
@@ -41,7 +41,7 @@ class RoleLogger: ListenerAdapter() {
             val user = it[0].user?.asMention ?: "Discord"
             val update = "`${event.oldName}` → `${event.newName}`"
 
-            Logs.sendLog(channel, "\uD83C\uDFF7️ $user a modifié le nom de ${event.role.asMention} ($update)", Colors.BLUE)
+            Logs.sendLog(channel, Colors.BLUE, "\uD83C\uDFF7️ $user a modifié le nom de ${event.role.asMention} ($update)")
         }
     }
 
@@ -57,7 +57,7 @@ class RoleLogger: ListenerAdapter() {
             val removed = event.oldPermissions
                 .filter { it !in event.newPermissions }.joinToString("\n") { "❌ " + Translate.PERMISSION[it] }
 
-            Logs.sendLog(channel, "$user a changé les permissions de ${event.role.asMention}\n$added\n$removed", Colors.BLUE)
+            Logs.sendLog(channel, Colors.BLUE, "$user a changé les permissions de ${event.role.asMention}\n$added\n$removed")
         }
     }
 
@@ -66,7 +66,7 @@ class RoleLogger: ListenerAdapter() {
 
         event.guild.retrieveAuditLogs().type(ActionType.ROLE_DELETE).limit(1).queue {
             val user = it[0].user?.asMention ?: "Discord"
-            Logs.sendLog(channel,"\uD83D\uDDD1️ $user a supprimé le rôle `@${event.role.name}`", Colors.RED)
+            Logs.sendLog(channel, Colors.RED, "\uD83D\uDDD1️ $user a supprimé le rôle `@${event.role.name}`")
         }
     }
 
@@ -79,7 +79,7 @@ class RoleLogger: ListenerAdapter() {
             description += if (it[0].user == event.user) "${event.user.asMention} s'est ajouté ${event.roles[0].asMention}"
             else "${it[0].user?.asMention ?: "Discord"} a ajouté ${event.roles[0].asMention} a ${event.user.asMention}"
 
-            Logs.sendLog(channel, description, Colors.BLUE)
+            Logs.sendLog(channel, Colors.BLUE, description)
         }
     }
 
@@ -92,7 +92,7 @@ class RoleLogger: ListenerAdapter() {
             description += if (it[0].user == event.user) "${event.user.asMention} s'est retiré ${event.roles[0].asMention}"
             else "${it[0].user?.asMention ?: "Discord"} a retiré ${event.roles[0].asMention} a ${event.user.asMention}"
 
-            Logs.sendLog(channel, description, Colors.BLUE)
+            Logs.sendLog(channel, Colors.BLUE, description)
         }
     }
 }

@@ -42,16 +42,15 @@ fun main() {
         )
         .build()
 
-    addListeners(jda)
-    buildCommands(jda)
-    println("Bot is ready !")
-    Signal.handle(Signal("INT")) { jda.shutdown() }
-}
-
-fun addListeners(jda: JDA) {
     jda.addEventListener(
         Pages(), Xp(), CreateChannel(), DeleteChannel(), Roles(), *Logs.listenerData
     )
+
+    buildCommands(jda)
+    Database.ensureTables()
+
+    println("Bot is ready !")
+    Signal.handle(Signal("INT")) { jda.shutdown() }
 }
 
 fun buildCommands(jda: JDA) {
