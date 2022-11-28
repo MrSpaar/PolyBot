@@ -6,8 +6,7 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter
 
 class CreateChannel: ListenerAdapter() {
     override fun onGuildVoiceJoin(event: GuildVoiceJoinEvent) {
-        if ("Nik" !in  event.channelJoined.name) return
-        println("Yes")
+        if ("Créer" !in  event.channelJoined.name) return
 
         val entry = Database.findTempChannel(event.guild.idLong, event.channelJoined.idLong)
         if (entry.next()) return
