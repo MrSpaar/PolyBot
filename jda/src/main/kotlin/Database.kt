@@ -131,7 +131,7 @@ object Database {
         """)
     }
 
-    fun insertTempChannel(guildId: Long, userId: Long, txtId: Long, vocId: Long) {
+    fun insertTempChannel(guildId: Long, userId: Long, vocId: Long, txtId: Long) {
         CONN.createStatement().execute("""
             INSERT INTO pending
             VALUES ($guildId, $userId, $vocId, $txtId)
