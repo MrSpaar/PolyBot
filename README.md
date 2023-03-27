@@ -63,4 +63,3 @@ Utilisez `/config` pour choisir le salon et le message de bienvenue, chaque `<me
 | Départ d'un membre                     | Pseudo, ID et raison (ban, kick, ...)                   |
 | Membre banni                           | Pseudo, par qui et raison                               |
 | Membre unban                           | Pseudo, par qui et raison                               |
-| Création d'invitation                  | Lien, autheur, date d'expiration, nombre d'utilisations |

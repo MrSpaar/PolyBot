@@ -5,7 +5,7 @@
 #include "commands.h"
 
 
-Listener<dpp::guild_member_add_t> mah(&Env::BOT.on_guild_member_add, [](const dpp::guild_member_add_t &event) {
+Listener<dpp::guild_member_add_t> mah(&Env::BOT.on_guild_member_add, [](const auto &event) {
     Env::SQL << "INSERT OR IGNORE INTO users(user_id, guild_id) VALUES(?, ?)",
             soci::use(uint64_t(event.added.user_id)), soci::use(uint64_t (event.added.guild_id));
 
@@ -35,7 +35,7 @@ Listener<dpp::guild_member_add_t> mah(&Env::BOT.on_guild_member_add, [](const dp
             .set_description(":inbox_tray:" + event.added.get_mention() + " a rejoint le serveur")));
 });
 
-Listener<dpp::guild_member_remove_t> mlh(&Env::BOT.on_guild_member_remove, [](const dpp::guild_member_remove_t &event) {
+Listener<dpp::guild_member_remove_t> mlh(&Env::BOT.on_guild_member_remove, [](const auto &event) {
     Env::SQL << "DELETE FROM users WHERE user_id = ? AND guild_id = ?",
             soci::use(uint64_t(event.removed->id)), soci::use(uint64_t(event.removing_guild->id));
 
@@ -52,7 +52,7 @@ Listener<dpp::guild_member_remove_t> mlh(&Env::BOT.on_guild_member_remove, [](co
 });
 
 
-Listener<dpp::guild_ban_add_t> mbh(&Env::BOT.on_guild_ban_add, [](const dpp::guild_ban_add_t &event) {
+Listener<dpp::guild_ban_add_t> mbh(&Env::BOT.on_guild_ban_add, [](const auto &event) {
     Env::SQL << "DELETE FROM users WHERE user_id = ? AND guild_id = ?",
             soci::use(uint64_t(event.banned.id)), soci::use(uint64_t(event.banning_guild->id));
 
@@ -69,7 +69,7 @@ Listener<dpp::guild_ban_add_t> mbh(&Env::BOT.on_guild_ban_add, [](const dpp::gui
 });
 
 
-Listener<dpp::guild_ban_remove_t> muh(&Env::BOT.on_guild_ban_remove, [](const dpp::guild_ban_remove_t &event) {
+Listener<dpp::guild_ban_remove_t> muh(&Env::BOT.on_guild_ban_remove, [](const auto &event) {
     uint64_t log_channel_id;
     Env::SQL << "SELECT log_channel_id FROM guilds WHERE id = ?",
             soci::use(uint64_t(event.unbanning_guild->id)), soci::into(log_channel_id);
