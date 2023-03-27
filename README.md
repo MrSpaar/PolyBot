@@ -1,13 +1,10 @@
 # PolyBot
 
-Pour compiler le projet, il suffit d'utiliser `cmake` :
-```bash
-mkdir build && cd build
-cmake ..
-make
-```
+Pour installer le bot, il suffit d'exécuter le script `install.sh`, deux options sont disponibles :
+ - `-I=?` pour spécifier le chemin d'installation
+ - `-C=?` pour spécifier le nombre de coeurs à utiliser
 
-Un exécutable `PolyBot` sera alors généré dans le dossier `build`.<br>
+Un script `PolyBot` sera alors généré dans le dossier d'installation, il suffit de l'exécuter pour lancer le bot.<br>
 La configuration du bot se fait avec un fichier `.env` puis il suffit de modifier le main.<br>
 
 ⚠️ Le bot est en plein transfert de JDA vers DPP, certaines fonctionnalités ne sont pas encore implémentées.<br>

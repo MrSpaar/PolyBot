@@ -1,7 +1,18 @@
 #bin/bash
 
-[[ -z "$1" ]] && core_count=$(($(nproc) - 1)) || core_count=$1
-[[ -z "$2" ]] && install_path="cmake-build-run" || install_path=$2
+while [ $# -gt 0 ]; do
+  case "$1" in
+    -I=*) install_path="${1#*=}" ;;
+    -C=*) cores="${1#*=}" ;;
+    *)
+      printf "Error: Unknown option: %s" "$1"
+      exit 1
+  esac
+  shift
+done
+
+[[ -z "$cores" ]] && cores=$(nproc)
+[[ -z "$install_path" ]] && install_path="build"
 
 [[ $(command -v git) ]] || printf "Error: git is not installed" || exit
 [[ $(command -v g++) ]] || printf "Error: g++ is not installed" || exit
@@ -27,5 +38,5 @@ fi
 
 [[ -d "$install_path" ]] || mkdir "$install_path"
 cmake -S . -B "$install_path"
-make -C "$install_path" -j"$core_count"
+make -C "$install_path" -j"$cores"
 printf "Done!\n"
