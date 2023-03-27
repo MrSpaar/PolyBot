@@ -3,7 +3,6 @@
 // TODO :
 //  - Role menu handlers
 //  - Music command handlers
-//  - Temporary channels
 
 
 int main() {
