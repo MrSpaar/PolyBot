@@ -15,7 +15,7 @@ void kick_handler(const dpp::slashcommand_t &event) {
         reason = subcommand.get_value<std::string>(1);
 
     Env::BOT.guild_member_delete(event.command.guild_id, member_id, [&](const dpp::confirmation_callback_t &callback) {
-            if (!callback.is_error())
+            if (callback.is_error())
                 return Command::reply(event, dpp::embed()
                         .set_description("❌ Impossible d'expulser le membre")
                         .set_color(colors::RED), true
@@ -39,7 +39,7 @@ void ban_handler(const dpp::slashcommand_t &event) {
         reason = subcommand.get_value<std::string>(1);
 
     Env::BOT.guild_ban_add(event.command.guild_id, member_id, 0, [&](const dpp::confirmation_callback_t &callback) {
-            if (!callback.is_error())
+            if (callback.is_error())
                 return Command::reply(event, dpp::embed()
                         .set_description("❌ Impossible de bannir le membre")
                         .set_color(colors::RED), true
