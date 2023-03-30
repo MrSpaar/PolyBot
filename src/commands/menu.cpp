@@ -6,11 +6,14 @@
 
 
 void buttons_handler(const dpp::slashcommand_t &event) {
+    std::string title = event.command.get_command_interaction().options[0].get_value<std::string>(0);
+
 
 }
 
 
 void select_handler(const dpp::slashcommand_t &event) {
+    std::string title = event.command.get_command_interaction().options[0].get_value<std::string>(0);
 
 }
 

@@ -5,7 +5,17 @@ Pour installer le bot, il suffit d'exécuter le script `install.sh`, deux option
  - `-C=?` pour spécifier le nombre de coeurs à utiliser
 
 Un script `PolyBot` sera alors généré dans le dossier d'installation, il suffit de l'exécuter pour lancer le bot.<br>
-La configuration du bot se fait avec un fichier `.env` puis il suffit de modifier le main.<br>
+La configuration du bot se fait avec un fichier `.env` :
+```dotenv
+GUILD_ID="..."
+
+CHANNEL_PREFIX="..."
+DB_PATH="..."
+DISCORD_TOKEN="..."
+
+TWITCH_CLIENT="..."
+TWITCH_TOKEN="..."
+```
 
 ⚠️ Le bot est en plein transfert de JDA vers DPP, certaines fonctionnalités ne sont pas encore implémentées.<br>
 Certaines fonctionnalités n'ont pas encore été testées, des bugs peuvent donc apparaître.
@@ -38,11 +48,11 @@ Il est possible d'envoyer des messages de level up avec `/config`.
 - `/rang perso` vous montrera votre niveau et votre progression vers le prochain niveau<br>
 - `/rang global` vous montrera le classement du serveur par pages de 10.
 
-### • ⏲️ [Channels temporaires](./src/listeners/channels.cpp) (WIP)
+### • ⏲️ [Salons temporaires](./src/listeners/channels.cpp)
 
 Ce module permet d'avoir des channels vocaux temporaires :
 
-- Chaque channel contenant [ce prefix](https://github.com/MrSpaar/Polybot/tree/master/jda/src/main/kotlin/events/CreateChannel.kt#L9) génèrera un channel tempaire dès que quelqu'un le rejoindra.
+- Chaque générateur de salon temporaire doit contenir le `CHANNEL_PREFIX` du `.env` dans son nom.
 - Un channel écrit est généré et lié avec le channel temporaire.
 - Les deux sont supprimés dès que le channel vocal est vide.
 

@@ -28,6 +28,8 @@ void Env::load(const std::string &path) {
         else
             env[line.substr(0, pos)] = line.substr(pos + 1);
     }
+
+    file.close();
 }
 
 
