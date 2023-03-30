@@ -96,7 +96,7 @@ Listener<dpp::voice_state_update_t> vsuh(&Env::BOT.on_voice_state_update, [](con
             return;
         }
 
-    if (joined->name.find("Créer") == std::string::npos)
+    if (joined->name.find(Env::get("CHANNEL_PREFIX")) == std::string::npos)
         return;
 
     if (voice_cache.contains(event.state.user_id)) {
