@@ -27,10 +27,10 @@ add_executable(${PROJECT_NAME}
         includes/pages.h src/core/pages.cpp
 
         src/commands/search.cpp src/commands/music.cpp
-        src/commands/moderation.cpp src/commands/menu.cpp
-        src/commands/config.cpp src/commands/levels.cpp
-        src/listeners/logs.cpp src/listeners/levels.cpp
-        src/listeners/channels.cpp)
+        src/commands/moderation.cpp src/commands/config.cpp
+        src/commands/menu.cpp src/listeners/menu.cpp
+        src/commands/levels.cpp src/listeners/levels.cpp
+        src/listeners/logs.cpp src/listeners/channels.cpp )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE ${LIBS})
 target_include_directories(${PROJECT_NAME} PRIVATE ${LIBS})

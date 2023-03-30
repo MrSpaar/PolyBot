@@ -56,7 +56,7 @@ Ce module permet d'avoir des channels vocaux temporaires :
 - Un channel écrit est généré et lié avec le channel temporaire.
 - Les deux sont supprimés dès que le channel vocal est vide.
 
-### • 📌 [Menu de rôles](./src/listeners/menu.cpp) (WIP)
+### • 📌 [Menu de rôles](./src/listeners/menu.cpp)
 
 Ce module permet de créer deux types de menu de rôles :
 - Avec des boutons, l'utilisateur peut s'ajouter n'importe quel rôle parmi la liste
