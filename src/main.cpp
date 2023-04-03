@@ -1,8 +1,6 @@
 #include "commands.h"
 
-// TODO :
-//  - Role menu handlers
-//  - Music command handlers
+// TODO : Music command handlers
 
 
 int main() {

@@ -71,13 +71,10 @@ Listener<dpp::message_reaction_add_t> mrah(&Env::BOT.on_message_reaction_add, []
                     soci::use(uint64_t(event.reacting_guild->id), "id"), soci::use(next_page * 10, "offset")
     );
 
-    std::vector<std::string> values = Pages::process_rows(rows, event.reacting_guild->id);
+    dpp::embed embed = dpp::embed()
+            .set_color(colors::BLUE)
+            .set_footer("Page " + std::to_string(next_page), "");
 
-    page->update(dpp::embed()
-             .set_color(colors::BLUE)
-             .set_footer("Page " + std::to_string(next_page), "")
-             .add_field("Nom", values[0], true)
-             .add_field("Niveau", values[1], true)
-             .add_field("Progression", values[2], true)
-    );
+    Pages::process_rows(rows, embed);
+    page->update(embed);
 });

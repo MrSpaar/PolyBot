@@ -57,11 +57,11 @@ std::string Pages::to_progress_bar(int level, int xp, int length) {
     double next_cumulative = 5.0/6 * (level+1) * (2*(level+1)*(level+1) + 27*(level+1) + 91);
 
     double progress = next_cap - next_cumulative + xp;
-    int filled = (int) (progress / next_cap * length);
-    int percent = (int) (progress / next_cap * 100);
+    int filled = std::max(1, (int) (progress / next_cap * length));
+    int percent = std::max(1, (int) (progress / next_cap * 100));
 
     for (int i = 0; i < filled; i++)
-        bar += "\\uD83D\\uDFE9";
+        bar += "🟩";
 
     for (int i = 0; i < length-filled; i++)
         bar += "⬛";
@@ -71,27 +71,19 @@ std::string Pages::to_progress_bar(int level, int xp, int length) {
 }
 
 
-std::vector<std::string> Pages::process_rows(const soci::rowset<soci::row> &rows, const dpp::snowflake &guild_id) {
-    std::vector<std::string> values;
+void Pages::process_rows(const soci::rowset<soci::row>& rows, dpp::embed& embed) {
+    std::string names, levels, progress;
 
-    for(auto &row : rows) {
-        auto user_id = row.get<uint64_t>(0);
+    for (auto& row: rows) {
         auto level = row.get<int>(1);
         auto xp = row.get<int>(2);
-        auto rank = row.get<int>(3);
 
-        Env::BOT.guild_get_member(guild_id, user_id, [&](const dpp::confirmation_callback_t &callback) {
-            if (callback.is_error())
-                return;
-
-            dpp::guild_member member = std::get<dpp::guild_member>(callback.value);
-            std::string effective_name = member.nickname.empty() ? member.get_user()->username : member.nickname;
-
-            values.push_back(std::to_string(rank) + ". " + effective_name);
-            values.push_back(std::to_string(level));
-            values.push_back(to_progress_bar(level, xp, 6));
-        });
+        names += row.get<std::string>(3) + ". <@" + row.get<std::string>(0) + ">\n";
+        levels += std::to_string(level) + "\n";
+        progress += to_progress_bar(level, xp, 6) + "\n";
     }
 
-    return values;
+    embed.add_field("Nom", names, true)
+            .add_field("Niveau", levels, true)
+            .add_field("Progression", progress, true);
 }

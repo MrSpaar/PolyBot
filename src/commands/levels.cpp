@@ -31,7 +31,7 @@ void rank_handler(const dpp::slashcommand_t &event) {
 
     Command::reply(event, dpp::embed()
             .set_color(colors::GREEN)
-            .add_field("Niveau" + std::to_string(level), Pages::to_progress_bar(level, xp, 10), false)
+            .add_field("Niveau " + std::to_string(level), Pages::to_progress_bar(level, xp, 14), false)
             .set_author("Progression de " + effective_name, "", member.get_avatar_url())
     );
 }
@@ -43,15 +43,12 @@ void leaderboard_handler(const dpp::slashcommand_t &event) {
                     soci::use(uint64_t(event.command.guild_id))
     );
 
-    std::vector<std::string> values = Pages::process_rows(rows, event.command.guild_id);
-
-    Command::reply(event, dpp::embed()
+    dpp::embed embed = dpp::embed()
             .set_color(colors::BLUE)
-            .set_footer("Page 1", "")
-            .add_field("Nom", values[0], true)
-            .add_field("Niveau", values[1], true)
-            .add_field("Progression", values[2], true)
-    );
+            .set_footer("Page 1", "");
+
+    Pages::process_rows(rows,  embed);
+    Command::reply(event, embed);
 
     event.get_original_response([](const dpp::confirmation_callback_t &callback) {
         if (callback.is_error())

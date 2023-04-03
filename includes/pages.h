@@ -17,7 +17,7 @@ public:
     static Pages* get(dpp::snowflake id);
     static void create(const dpp::message& message);
     static std::string to_progress_bar(int level, int xp, int length);
-    static std::vector<std::string> process_rows(const soci::rowset<soci::row> &rows, const dpp::snowflake &guild_id);
+    static void process_rows(const soci::rowset<soci::row> &rows, dpp::embed& embed);
 
     void update(const dpp::embed& embed);
     int increment(int total_pages, bool plus);
