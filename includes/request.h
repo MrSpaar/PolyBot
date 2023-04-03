@@ -5,11 +5,10 @@
 #ifndef POLYBOT_REQUEST_H
 #define POLYBOT_REQUEST_H
 
+#include <list>
 #include <sstream>
+#include <curl/curl.h>
 #include <nlohmann/json.hpp>
-#include <curlpp/Easy.hpp>
-#include <curlpp/cURLpp.hpp>
-#include <curlpp/Options.hpp>
 
 
 class Request {
@@ -21,11 +20,11 @@ public:
     nlohmann::json post(const std::string &data);
     Request &add_header(const std::string &header, const std::string &value);
 private:
-    curlpp::Cleanup cleaner;
-    curlpp::Easy request;
+    CURL *curl;
+    std::string body;
+    curl_slist *headers = nullptr;
 
-    std::ostringstream os;
-    std::list<std::string> headers;
+    static size_t write_data(void *ptr, size_t size, size_t nmemb, void *stream);
 };
 
 

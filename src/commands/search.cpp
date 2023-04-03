@@ -14,8 +14,13 @@ struct {
 } twitch_oauth;
 
 
-dpp::embed parse_twitch_response(std::vector<std::string> &filters, const json &j) {
-    if (j["data"].empty())
+dpp::embed fetch_streams(const std::string &category, const std::string &limit, std::vector<std::string> &filters) {
+    json j = Request("https://api.twitch.tv/helix/search/channels?live_only=true&query=" + category + "&first=" + limit)
+            .add_header("Client-ID", Env::get("TWITCH_CLIENT"))
+            .add_header("Authorization", "Bearer " + twitch_oauth.token)
+            .get();
+
+    if (j.contains("error"))
         return dpp::embed()
                 .set_description("❌ Aucun résultat")
                 .set_color(colors::RED);
@@ -44,16 +49,6 @@ dpp::embed parse_twitch_response(std::vector<std::string> &filters, const json &
 }
 
 
-dpp::embed fetch_streams(const std::string &category, const std::string &limit, std::vector<std::string> &filters) {
-    return parse_twitch_response(filters,
-            Request("https://api.twitch.tv/helix/search/channels?live_only=true&query=" + category + "&first=" + limit)
-            .add_header("Client-ID", Env::get("TWITCH_CLIENT"))
-            .add_header("Authorization", "Bearer " + twitch_oauth.token)
-            .get()
-    );
-}
-
-
 void twitch_handler(const dpp::slashcommand_t &event) {
     auto subcommand = event.command.get_command_interaction().options[0];
     std::string category = subcommand.get_value<std::string>(0);
@@ -70,11 +65,18 @@ void twitch_handler(const dpp::slashcommand_t &event) {
     if (!twitch_oauth.token.empty() && twitch_oauth.expires > time(nullptr))
         return Command::reply(event, fetch_streams(category, limit, filters));
 
+    std::string data = "client_id=" + Env::get("TWITCH_CLIENT") +
+                       "&client_secret=" + Env::get("TWITCH_TOKEN") +
+                       "&grant_type=client_credentials";
+
     json j = Request("https://id.twitch.tv/oauth2/token")
-            .post("client_id=" + Env::get("TWITCH_CLIENT") +
-                  "&client_secret=" + Env::get("TWITCH_SECRET") +
-                  "&grant_type=client_credentials"
-            );
+            .post(data);
+
+    if (j.contains("error"))
+        return Command::reply(event, dpp::embed()
+                .set_description("❌ Une erreur est survenue")
+                .set_color(colors::RED), true
+        );
 
     twitch_oauth.token = j["access_token"];
     twitch_oauth.expires = time(nullptr) + (time_t) j["expires_in"];
