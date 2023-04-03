@@ -1,10 +1,5 @@
 # PolyBot
 
-Pour installer le bot, il suffit d'exécuter le script `install.sh`, deux options sont disponibles :
- - `-I=?` pour spécifier le chemin d'installation
- - `-C=?` pour spécifier le nombre de coeurs à utiliser
-
-Un script `PolyBot` sera alors généré dans le dossier d'installation, il suffit de l'exécuter pour lancer le bot.<br>
 La configuration du bot se fait avec un fichier `.env` :
 ```dotenv
 GUILD_ID="..."
@@ -16,6 +11,8 @@ DISCORD_TOKEN="..."
 TWITCH_CLIENT="..."
 TWITCH_TOKEN="..."
 ```
+
+Une fois configuré, il suffit de déployer le bot avec `docker-compose up -d`.
 
 ⚠️ Le bot est en plein transfert de JDA vers DPP, certaines fonctionnalités ne sont pas encore implémentées.<br>
 Certaines fonctionnalités n'ont pas encore été testées, des bugs peuvent donc apparaître.

@@ -1,10 +1,10 @@
-cmake_minimum_required(VERSION 3.26)
+cmake_minimum_required(VERSION 3.24)
 project(PolyBot VERSION 1.0)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 include_directories(includes)
 
-option(WITH_SQLITE3 ON)
+set(WITH_SQLITE3 ON)
 set(WITH_BOOST OFF)
 set(WITH_MYSQL OFF)
 set(WITH_ORACLE OFF)
@@ -15,9 +15,8 @@ set(WITH_FIREBIRD OFF)
 
 add_subdirectory(libs/soci)
 add_subdirectory(libs/DPP)
-add_subdirectory(libs/curlpp)
 
-list(APPEND LIBS soci_core soci_sqlite3 dpp curlpp)
+list(APPEND LIBS soci_core soci_sqlite3 dpp curl)
 
 add_executable(${PROJECT_NAME}
         src/main.cpp
