@@ -3,3 +3,4 @@ database.db
 .idea/
 libs/
 cmake-build-run/
+cmake-build-debug/

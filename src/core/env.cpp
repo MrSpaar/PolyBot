@@ -36,6 +36,34 @@ void Env::load(const std::string &path) {
 void Env::init(const std::string &token, const std::string &db_path) {
     BOT.token = token;
     SQL.open(soci::sqlite3, db_path);
+
+    SQL << "CREATE TABLE IF NOT EXISTS guilds ("
+           "id STRING PRIMARY KEY, "
+           "annonce_channel TEXT, "
+           "logs_channel TEXT, "
+           "newcomer_role TEXT, "
+           "welcome_channel TEXT, "
+           "welcome_message TEXT"
+    ");";
+
+    SQL << "CREATE TABLE IF NOT EXISTS users ("
+           "id STRING, "
+           "guild STRING, "
+           "xp INTEGER, "
+           "level INTEGER, "
+
+           "PRIMARY KEY (id, guild),"
+           "FOREIGN KEY (guild) REFERENCES guilds(id) ON DELETE CASCADE"
+    ");";
+
+    SQL << "CREATE TABLE IF NOT EXISTS pending ("
+           "guild STRING, "
+           "user STRING, "
+           "voice_channel STRING, "
+           "text_channel STRING, "
+
+           "PRIMARY KEY (guild, user)"
+    ");";
 }
 
 
