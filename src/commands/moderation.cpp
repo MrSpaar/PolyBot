@@ -23,7 +23,7 @@ void kick_handler(const dpp::slashcommand_t &event) {
 
             Command::reply(event, dpp::embed()
                     .set_color(colors::GREEN)
-                    .set_description("\\uD83D\\uDD28 <@"+std::to_string(member_id)+"> a été expulsé\n❔ Raison : "+reason)
+                    .set_description("📤 <@"+std::to_string(member_id)+"> a été expulsé\n❔ Raison : "+reason)
             );
     });
 }
@@ -47,7 +47,7 @@ void ban_handler(const dpp::slashcommand_t &event) {
 
             Command::reply(event, dpp::embed()
                     .set_color(colors::GREEN)
-                    .set_description("\\uD83D\\uDD28 <@"+std::to_string(member_id)+"> a été banni\n❔ Raison : "+reason)
+                    .set_description("🔨 <@"+std::to_string(member_id)+"> a été banni\n❔ Raison : "+reason)
             );
     });
 }
@@ -71,7 +71,7 @@ void unban_handler(const dpp::slashcommand_t &event) {
 
             Command::reply(event, dpp::embed()
                     .set_color(colors::GREEN)
-                    .set_description("\\uD83D\\uDD28 <@"+std::to_string(member_id)+"> a été débanni\n❔ Raison : "+reason)
+                    .set_description("📜 <@" + std::to_string(member_id) + "> a été débanni\n❔ Raison : " + reason)
             );
     });
 }
