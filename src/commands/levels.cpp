@@ -13,13 +13,14 @@ void rank_handler(const dpp::slashcommand_t &event) {
     if (subcommand.options.size() > 1)
         member = event.command.get_resolved_member(subcommand.get_value<dpp::snowflake>(0));
 
-    int level, xp, rank;
+    int level=0, xp=0, rank=0;
     Env::SQL << "SELECT level, xp, rank FROM ("
-                    "   SELECT level, xp, user_id, ROW_NUMBER() OVER (ORDER BY xp DESC) AS rank FROM users WHERE guild_id = ?"
-                    ") WHERE user_id = ?",
-            soci::use(uint64_t(event.command.guild_id)), soci::use(uint64_t(member.user_id)),
+                    "   SELECT level, xp, id, ROW_NUMBER() OVER (ORDER BY xp DESC) AS rank FROM users WHERE guild = ?"
+                    ") WHERE id = ?",
+            soci::use(std::to_string(event.command.guild_id)), soci::use(std::to_string(member.user_id)),
             soci::into(level), soci::into(xp), soci::into(rank);
 
+    std::cout << "level: " << level << ", xp: " << xp << ", rank: " << rank << std::endl;
 
     if (xp == 0)
         return Command::reply(event, dpp::embed()
@@ -39,9 +40,15 @@ void rank_handler(const dpp::slashcommand_t &event) {
 
 void leaderboard_handler(const dpp::slashcommand_t &event) {
     soci::rowset<soci::row> rows = (
-            Env::SQL.prepare << "SELECT user_id, level, xp, ROW_NUMBER() OVER (ORDER BY xp DESC) AS rank FROM users WHERE guild_id = ? LIMIT 10",
-                    soci::use(uint64_t(event.command.guild_id))
+            Env::SQL.prepare << "SELECT id, level, xp, ROW_NUMBER() OVER (ORDER BY xp DESC) AS rank FROM users WHERE guild = ? LIMIT 10",
+                    soci::use(std::to_string(event.command.guild_id))
     );
+
+    if (rows.begin() == rows.end())
+        return Command::reply(event, dpp::embed()
+                .set_color(colors::RED)
+                .set_description("❌ Le serveur n'a pas encore de membres enregistrés"), true
+        );
 
     dpp::embed embed = dpp::embed()
             .set_color(colors::BLUE)
@@ -65,5 +72,5 @@ Command level = Command("rang", "Commande de base pour les niveaux")
                 .add_option(dpp::co_user, "membre", "Membre à afficher", false)
         )
         .add_subcommand(
-                Subcommand("classement", "Afficher le classement du serveur", leaderboard_handler)
+                Subcommand("global", "Afficher le classement du serveur", leaderboard_handler)
         );
