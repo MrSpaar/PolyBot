@@ -78,31 +78,33 @@ void unban_handler(const dpp::slashcommand_t &event) {
 
 
 void clear_handler(const dpp::slashcommand_t &event) {
-    auto subcommand = event.command.get_command_interaction().options[0];
-
-    int count = (int) subcommand.get_value<double>(0);
+    int64_t count = std::get<int64_t>(event.get_parameter("nombre"));
     dpp::snowflake channel_id = event.command.channel_id;
 
-    std::vector<dpp::snowflake> to_delete;
+    Env::BOT.messages_get(channel_id, 0, 0, 0, count, [event, channel_id](const dpp::confirmation_callback_t &callback) {
+        if (callback.is_error())
+            return Command::reply(event, dpp::embed()
+                    .set_description("❌ Impossible de supprimer les messages")
+                    .set_color(colors::RED), true
+            );
 
-    Env::BOT.messages_get(channel_id, 0, 0, 0, count, [&](const dpp::confirmation_callback_t &callback) {
+        std::vector<dpp::snowflake> to_delete{};
+        dpp::message_map messages = get<dpp::message_map>(callback.value);
+
+        for (auto &[snowflake, message]: messages)
+            to_delete.push_back(snowflake);
+
+        Env::BOT.message_delete_bulk(to_delete, channel_id, [&](const dpp::confirmation_callback_t &callback) {
             if (callback.is_error())
                 return Command::reply(event, dpp::embed()
                         .set_description("❌ Impossible de supprimer les messages")
                         .set_color(colors::RED), true
                 );
 
-            for (auto &message: get<dpp::message_map>(callback.value))
-                to_delete.push_back(message.first);
-
-        Env::BOT.message_delete_bulk(to_delete, channel_id, [&](const dpp::confirmation_callback_t &callback) {
-                if (callback.is_error())
-                    return;
-
-                Command::reply(event, dpp::embed()
-                        .set_color(colors::GREEN)
-                        .set_description("\\uD83D\\uDD28 "+std::to_string(to_delete.size())+" messages ont été supprimés")
-                );
+            Command::reply(event, dpp::embed()
+                    .set_color(colors::GREEN)
+                    .set_description("🗑 "+std::to_string(to_delete.size())+" messages ont été supprimés")
+            );
         });
     });
 }
