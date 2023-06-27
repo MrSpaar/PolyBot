@@ -10,8 +10,16 @@ std::map<dpp::snowflake, std::pair<dpp::snowflake, dpp::snowflake>> user_cache;
 
 
 void channel_joined_handler(const dpp::guild_member &member, const dpp::snowflake category_id) {
-    std::string name = Env::get("TEMP_CHANNEL_PREFIX") +
-            (member.nickname.empty() ? member.get_user()->username : member.nickname);
+    std::string effective_name = member.nickname;
+
+    if (effective_name.empty() && member.get_user() == nullptr) {
+        dpp::user_identified user = Env::BOT.user_get_sync(member.user_id);
+        effective_name = user.username;
+    } else if (effective_name.empty()) {
+        effective_name = member.get_user()->username;
+    }
+
+    std::string name = Env::get("TEMP_CHANNEL_PREFIX") + effective_name;
 
     dpp::channel voice_channel = Env::BOT.channel_create_sync(
             dpp::channel()
@@ -28,9 +36,16 @@ void channel_joined_handler(const dpp::guild_member &member, const dpp::snowflak
                     .set_type(dpp::channel_type::CHANNEL_TEXT)
     );
     
-    Env::BOT.guild_member_move_sync(voice_channel.id, member.guild_id, member.user_id);
-    channel_cache[voice_channel.id] = text_channel.id;
-    user_cache[member.user_id] = {voice_channel.id, voice_channel.id};
+    Env::BOT.guild_member_move(voice_channel.id, member.guild_id, member.user_id, [member, voice_channel, text_channel](const dpp::confirmation_callback_t &callback) {
+        if (callback.is_error()) {
+            Env::BOT.channel_delete(voice_channel.id);
+            Env::BOT.channel_delete(text_channel.id);
+            exit(1);
+        }
+
+        channel_cache[voice_channel.id] = text_channel.id;
+        user_cache[member.user_id] = {voice_channel.id, voice_channel.id};
+    });
 }
 
 
