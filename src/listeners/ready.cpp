@@ -25,7 +25,7 @@ void Listeners::onReady(const dpp::ready_t &event) {
         std::cout << "No slash registered in \"" << Env::get("JSON_PATH") << "\"" << std::endl;
     }
 
-    Env::BOT.guild_bulk_command_create(Env::TO_BUILD, Env::get("GUILD_ID"), [](const auto &callback) {
+    Env::BOT.global_bulk_command_create(Env::TO_BUILD, [](const auto &callback) {
         if (callback.is_error()) {
             std::cout << "Error creating commands: " << callback.get_error().message << std::endl;
             exit(1);
