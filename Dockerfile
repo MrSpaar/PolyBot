@@ -1,9 +1,9 @@
-FROM alpine:latest
+FROM debian:latest
 
-RUN apk update && apk upgrade
+RUN apt update && apk upgrade
 
-RUN apk add sqlite-libs
-RUN apk add bash curl git jq wget make cmake g++ \
+RUN apt install sqlite-libs
+RUN apt install add bash curl git jq wget make cmake g++ \
         opus-dev libsodium-dev zlib-dev openssl-dev curl-dev sqlite-dev
 
 WORKDIR /app
@@ -17,12 +17,11 @@ RUN mkdir libs
 RUN git clone https://github.com/SOCI/soci.git libs/soci
 
 RUN curl -sL "https://api.github.com/repos/brainboxdotcc/DPP/releases/latest" \
-            | jq -r ".tarball_url" \
-            | wget -q -O DPP.tar.gz -i - \
+            | jq -r "linux-x64.deb" \
+            | wget -q -O DPP.deb -i - \
             || (printf "Error: Failed to download DPP\n" && exit) \
-            && tar -xzf DPP.tar.gz \
-            && mv brainboxdotcc-DPP-* libs/DPP \
-            && rm DPP.tar.gz
+            && dpkg -i DPP.deb \
+            && rm DPP.deb
 
 RUN mkdir build && cd build && cmake .. && make -j$(nproc)
 

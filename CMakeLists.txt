@@ -14,9 +14,10 @@ set(WITH_DB2 OFF)
 set(WITH_FIREBIRD OFF)
 
 add_subdirectory(libs/soci)
-add_subdirectory(libs/DPP)
+find_package(dpp REQUIRED)
 
 list(APPEND LIBS soci_core soci_sqlite3 dpp curl)
+
 
 add_executable(${PROJECT_NAME}
         src/main.cpp includes/listeners.h
