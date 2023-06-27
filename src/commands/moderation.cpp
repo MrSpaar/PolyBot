@@ -113,7 +113,7 @@ void Commands::clear_handler(const dpp::slashcommand_t &event) {
 
             Commands::reply(event, dpp::embed()
                     .set_color(colors::GREEN)
-                    .set_description("🗑 "+std::to_string(to_delete.size())+" messages ont été supprimés")
+                    .set_description("🗑 "+std::to_string(to_delete.size())+" messages ont été supprimés"), true
             );
         });
     });
