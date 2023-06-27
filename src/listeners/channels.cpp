@@ -73,7 +73,7 @@ void Listeners::onVoiceStateUpdate(const dpp::voice_state_update_t &event) {
         return channel_left_handler(event);
 
     bool is_user_cached = user_cache.contains(event.state.user_id);
-    bool is_gen_channel = joined->name.rfind(Env::get("GEN_CHANNEL_PREFIX"), 0) == 0;
+    bool is_gen_channel = joined->name.find(Env::get("GEN_CHANNEL_PREFIX"), 0) != std::string::npos;
     bool is_temp_channel = joined->name.rfind(Env::get("TEMP_CHANNEL_PREFIX"), 0) == 0;
 
     if (!is_temp_channel && !is_gen_channel)
