@@ -35,7 +35,7 @@ namespace Commands {
 }
 
 
-class Command: public dpp::slashcommand {
+class Command {
 public:
     Command(const std::string& name, const std::string& description, slash_handler handler = nullptr) {
         Env::TO_BUILD.emplace_back(name, description, 0);
