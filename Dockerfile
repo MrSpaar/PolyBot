@@ -11,7 +11,7 @@ COPY ./includes ./includes
 COPY ./src ./src
 COPY ./CMakeLists.txt ./CMakeLists.txt
 COPY ./.env ./.env
-COPY ./database.db ./database.db
+COPY data/database.db ./database.db
 
 RUN mkdir libs
 RUN git clone https://github.com/SOCI/soci.git libs/soci

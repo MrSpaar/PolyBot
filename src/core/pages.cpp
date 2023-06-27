@@ -15,32 +15,26 @@ Pages::Pages(const dpp::message& message, int page_num) {
 }
 
 
-void Pages::create(const dpp::message &message) {
-    CACHE[message.id] = new Pages(message);
-}
-
-
-void Pages::update(const dpp::embed& embed) {
+void Pages::update(const dpp::embed& embed, const dpp::snowflake &user, const dpp::emoji &emoji) {
     message.embeds.clear();
     message.add_embed(embed);
+
     Env::BOT.message_edit(message);
+    Env::BOT.message_delete_reaction(message, user, emoji.name);
 }
 
 
-int Pages::increment(int total_pages, bool plus) {
-    page_num = (plus ? page_num+1 : page_num-1) % total_pages;
+int Pages::increment(const std::string &guild_id, const std::string &emoji) {
+    int total_entries;
+    Env::SQL << "SELECT COUNT(*) FROM users WHERE guild = ?", soci::use(guild_id), soci::into(total_entries);
+
+    int total_pages = total_entries / 10 + 1;
+    page_num = (emoji == "➡️" ? page_num+1 : page_num-1) % total_pages;
 
     if (page_num < 0)
         page_num = total_pages-1;
 
     return page_num;
-}
-
-
-Pages *Pages::get(dpp::snowflake id) {
-    if (CACHE.contains(id))
-        return CACHE[id];
-    return nullptr;
 }
 
 
@@ -71,19 +65,23 @@ std::string Pages::to_progress_bar(int level, int xp, int length) {
 }
 
 
-void Pages::process_rows(const soci::rowset<soci::row>& rows, dpp::embed& embed) {
+bool Pages::process_rows(const soci::rowset<soci::row>& rows, dpp::embed& embed) {
     std::string names, levels, progress;
 
-    for (auto& row: rows) {
+    for (const auto& row: rows) {
         auto level = row.get<int>(1);
-        auto xp = row.get<int>(2);
 
-        names += row.get<std::string>(3) + ". <@" + row.get<std::string>(0) + ">\n";
+        names += "**" + row.get<std::string>(3) + ".** <@" + row.get<std::string>(0) + ">\n";
         levels += std::to_string(level) + "\n";
-        progress += to_progress_bar(level, xp, 6) + "\n";
+        progress += to_progress_bar(level, row.get<int>(2), 6) + "\n";
     }
 
+    if (names.empty())
+        return false;
+
     embed.add_field("Nom", names, true)
-            .add_field("Niveau", levels, true)
-            .add_field("Progression", progress, true);
+         .add_field("Niveau", levels, true)
+         .add_field("Progression", progress, true);
+
+    return true;
 }

@@ -2,111 +2,88 @@
 // Created by mrspaar on 3/23/23.
 //
 
-#include "commands.h"
+#include "listeners.h"
 
 
-std::map<dpp::snowflake, dpp::snowflake> voice_cache;
+std::map<dpp::snowflake, dpp::snowflake> channel_cache;
+std::map<dpp::snowflake, std::pair<dpp::snowflake, dpp::snowflake>> user_cache;
 
-void channel_joined_handler(dpp::guild_member &member, dpp::channel *category) {
-    std::string name = "Salon de " + (member.nickname.empty() ? member.get_user()->username : member.nickname);
 
-    auto voice_chan = dpp::channel()
-            .set_name(name)
-            .set_parent_id(category->id)
-            .set_type(dpp::channel_type::CHANNEL_VOICE);
+void channel_joined_handler(const dpp::guild_member &member, const dpp::snowflake category_id) {
+    std::string name = Env::get("TEMP_CHANNEL_PREFIX") +
+            (member.nickname.empty() ? member.get_user()->username : member.nickname);
 
-    Env::BOT.channel_create(voice_chan, [&](const auto &callback) {
-        if (callback.is_error())
-            return;
+    dpp::channel voice_channel = Env::BOT.channel_create_sync(
+            dpp::channel()
+                    .set_name(name)
+                    .set_parent_id(category_id)
+                    .set_guild_id(member.guild_id)
+                    .set_type(dpp::channel_type::CHANNEL_VOICE)
+    );
 
-        voice_chan = std::get<dpp::channel>(callback.value);
-        voice_cache[member.user_id] = voice_chan.id;
-    });
-
-    if (voice_chan.id.empty())
-        return;
-
-    auto text_chan = dpp::channel()
-            .set_name(name)
-            .set_parent_id(category->id)
-            .set_type(dpp::channel_type::CHANNEL_TEXT);
-
-    Env::BOT.channel_create(text_chan, [&](const auto &callback) {
-        if (callback.is_error())
-            return;
-
-        text_chan = std::get<dpp::channel>(callback.value);
-    });
-
-    if (text_chan.id.empty())
-        return;
-
-    Env::BOT.guild_member_move(voice_chan.id, member.guild_id, member.user_id, [&](const auto &callback) {
-        if (callback.is_error()) {
-            Env::BOT.channel_delete(voice_chan.id);
-            Env::BOT.channel_delete(text_chan.id);
-            return;
-        }
-
-        Env::SQL << "INSERT INTO temp_channels (guild_id, user_id, voice_channel_id, text_channel_id) VALUES (?, ?, ?, ?)",
-                soci::use(uint64_t(member.guild_id)), soci::use(uint64_t(member.user_id)),
-                soci::use(uint64_t(voice_chan.id)), soci:: use(uint64_t(text_chan.id));
-    });
+    dpp::channel text_channel = Env::BOT.channel_create_sync(dpp::channel()
+                    .set_name(name)
+                    .set_parent_id(category_id)
+                    .set_guild_id(member.guild_id)
+                    .set_type(dpp::channel_type::CHANNEL_TEXT)
+    );
+    
+    Env::BOT.guild_member_move_sync(voice_channel.id, member.guild_id, member.user_id);
+    channel_cache[voice_channel.id] = text_channel.id;
+    user_cache[member.user_id] = {voice_channel.id, voice_channel.id};
 }
 
 
 void channel_left_handler(const dpp::voice_state_update_t &event) {
-    if (!voice_cache.contains(event.state.user_id))
+    if (!user_cache.contains(event.state.user_id))
         return;
 
-    dpp::channel *voice_chan = dpp::find_channel(voice_cache[event.state.user_id]);
-    if (voice_chan == nullptr)
+    dpp::channel *voice_chan = dpp::find_channel(user_cache[event.state.user_id].first);
+    if (voice_chan == nullptr || !voice_chan->get_voice_members().empty())
         return;
 
-    voice_cache.erase(event.state.user_id);
-    if (!voice_chan->get_voice_members().empty())
-        return;
+    Env::BOT.channel_delete(voice_chan->id);
+    Env::BOT.channel_delete(channel_cache[voice_chan->id]);
 
-    Env::BOT.channel_delete(voice_chan->id, [&](const auto &callback) {
-        if (callback.is_error())
-            return;
-
-        uint64_t text_chan_id;
-        Env::SQL << "SELECT text_channel_id FROM temp_channels WHERE guild_id = ? AND voice_channel_id = ?",
-                soci::use(uint64_t(event.state.guild_id)), soci::use(uint64_t(voice_chan->id)), soci::into(text_chan_id);
-
-        Env::SQL << "DELETE FROM temp_channels WHERE guild_id = ? AND voice_channel_id = ?",
-                soci::use(uint64_t(event.state.guild_id)), soci::use(uint64_t(voice_chan->id));
-
-        Env::BOT.channel_delete(text_chan_id);
-    });
+    user_cache.erase(event.state.user_id);
+    channel_cache.erase(voice_chan->id);
 }
 
 
-Listener<dpp::voice_state_update_t> vsuh(&Env::BOT.on_voice_state_update, [](const auto &event) {
+void Listeners::onVoiceStateUpdate(const dpp::voice_state_update_t &event) {
     dpp::channel *joined = dpp::find_channel(event.state.channel_id);
     dpp::guild_member member = dpp::find_guild_member(event.state.guild_id, event.state.user_id);
 
     if (joined == nullptr)
         return channel_left_handler(event);
 
-    for (auto &chan : voice_cache)
-        if (chan.second == joined->id) {
-            voice_cache[event.state.user_id] = chan.second;
-            return;
-        }
+    bool is_user_cached = user_cache.contains(event.state.user_id);
+    bool is_gen_channel = joined->name.rfind(Env::get("GEN_CHANNEL_PREFIX"), 0) == 0;
+    bool is_temp_channel = joined->name.rfind(Env::get("TEMP_CHANNEL_PREFIX"), 0) == 0;
 
-    if (joined->name.find(Env::get("CHANNEL_PREFIX")) == std::string::npos)
+    if (!is_temp_channel && !is_gen_channel)
         return;
 
-    if (voice_cache.contains(event.state.user_id)) {
-        Env::BOT.guild_member_move(voice_cache[event.state.user_id], event.state.guild_id, event.state.user_id);
+    if (is_temp_channel && !is_user_cached) {
+        user_cache[event.state.user_id] = {joined->id, 0};
         return;
     }
 
-    dpp::channel *category = dpp::find_channel(joined->parent_id);
-    if (category == nullptr)
+    if (is_temp_channel) {
+        user_cache[event.state.user_id].first = joined->id;
+        return;
+    }
+
+    if (!is_gen_channel)
         return;
 
-    channel_joined_handler(member, category);
-});
+    if (is_user_cached && !user_cache[event.state.user_id].second.empty())
+        return Env::BOT.guild_member_move(
+                user_cache[event.state.user_id].second,
+                event.state.guild_id,
+                event.state.user_id
+        );
+
+    if (!joined->parent_id.empty())
+        return channel_joined_handler(member, joined->parent_id);
+}

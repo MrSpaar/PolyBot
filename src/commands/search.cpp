@@ -49,7 +49,7 @@ dpp::embed fetch_streams(const std::string &category, const std::string &limit, 
 }
 
 
-void twitch_handler(const dpp::slashcommand_t &event) {
+void Commands::twitch_handler(const dpp::slashcommand_t &event) {
     auto subcommand = event.command.get_command_interaction().options[0];
     std::string category = subcommand.get_value<std::string>(0);
 
@@ -63,7 +63,7 @@ void twitch_handler(const dpp::slashcommand_t &event) {
     }
 
     if (!twitch_oauth.token.empty() && twitch_oauth.expires > time(nullptr))
-        return Command::reply(event, fetch_streams(category, limit, filters));
+        return Commands::reply(event, fetch_streams(category, limit, filters));
 
     std::string data = "client_id=" + Env::get("TWITCH_CLIENT") +
                        "&client_secret=" + Env::get("TWITCH_TOKEN") +
@@ -73,7 +73,7 @@ void twitch_handler(const dpp::slashcommand_t &event) {
             .post(data);
 
     if (j.contains("error"))
-        return Command::reply(event, dpp::embed()
+        return Commands::reply(event, dpp::embed()
                 .set_description("❌ Une erreur est survenue")
                 .set_color(colors::RED), true
         );
@@ -81,11 +81,11 @@ void twitch_handler(const dpp::slashcommand_t &event) {
     twitch_oauth.token = j["access_token"];
     twitch_oauth.expires = time(nullptr) + (time_t) j["expires_in"];
 
-    Command::reply(event, fetch_streams(category, limit, filters));
+    Commands::reply(event, fetch_streams(category, limit, filters));
 }
 
 
-void wiki_handler(const dpp::slashcommand_t &event) {
+void Commands::wiki_handler(const dpp::slashcommand_t &event) {
     auto subcommand = event.command.get_command_interaction().options[0];
     std::string title = subcommand.get_value<std::string>(0);
 
@@ -95,7 +95,7 @@ void wiki_handler(const dpp::slashcommand_t &event) {
     ).get();
 
     if (j.empty() || j["query"]["pages"].contains("-1"))
-        return Command::reply(event, dpp::embed()
+        return Commands::reply(event, dpp::embed()
                 .set_description("❌ Aucun résultat")
                 .set_color(colors::RED), true
         );
@@ -103,21 +103,9 @@ void wiki_handler(const dpp::slashcommand_t &event) {
     json article = j["query"]["pages"].begin().value();
     std::string full_url = "https://fr.wikipedia.org/wiki/" + article["title"].dump();
 
-    Command::reply(event, dpp::embed()
+    Commands::reply(event, dpp::embed()
             .set_color(colors::BLUE)
             .set_author("Wikipedia - " + (std::string) article["title"], "", "https://i.imgur.com/nDTQgbf.png")
             .set_description((std::string) article["extract"] + " [En savoir plus](" + full_url + ")")
     );
 }
-
-
-Command search = Command("recherche", "Base des commandes de recherche")
-        .add_subcommand(
-                Subcommand("twitch", "Rechercher des streams", twitch_handler)
-                .add_option(dpp::co_string, "categorie", "La catégorie des streams à rechercher", true)
-                .add_option(dpp::co_string, "filtres", "Mots-clés pour filtrer les résultats")
-        )
-        .add_subcommand(
-                Subcommand("wiki", "Rechercher un article Wikipedia", wiki_handler)
-                .add_option(dpp::co_string, "titre", "Le nom de l'article à rechercher", true)
-        );

@@ -6,57 +6,69 @@
 #include "commands.h"
 
 
-void rank_handler(const dpp::slashcommand_t &event) {
-    dpp::guild_member member = event.command.member;
-    auto subcommand = event.command.get_command_interaction().options[0];
+void Commands::rank_handler(const dpp::slashcommand_t &event) {
+    dpp::command_value param = event.get_parameter("membre");
+    bool has_param = std::holds_alternative<dpp::snowflake>(param);
 
-    if (subcommand.options.size() > 1)
-        member = event.command.get_resolved_member(subcommand.get_value<dpp::snowflake>(0));
+    std::string user_id = has_param ?
+            std::to_string(std::get<dpp::snowflake>(param)) : std::to_string(event.command.member.user_id);
 
     int level=0, xp=0, rank=0;
+    std::string guild_id = std::to_string(event.command.guild_id);
+
     Env::SQL << "SELECT level, xp, rank FROM ("
                     "   SELECT level, xp, id, ROW_NUMBER() OVER (ORDER BY xp DESC) AS rank FROM users WHERE guild = ?"
                     ") WHERE id = ?",
-            soci::use(std::to_string(event.command.guild_id)), soci::use(std::to_string(member.user_id)),
-            soci::into(level), soci::into(xp), soci::into(rank);
-
-    std::cout << "level: " << level << ", xp: " << xp << ", rank: " << rank << std::endl;
+            soci::use(guild_id), soci::use(user_id), soci::into(level), soci::into(xp), soci::into(rank);
 
     if (xp == 0)
-        return Command::reply(event, dpp::embed()
+        return Commands::reply(event, dpp::embed()
                 .set_color(colors::RED)
                 .set_description("❌ L'utilisateur n'est pas enregistré ou n'a jamais parlé"), true
         );
 
-    std::string effective_name = member.nickname.empty() ? member.get_user()->username : member.nickname;
+    dpp::guild_member member = has_param ? event.command.get_resolved_member(user_id) : event.command.member;
+    std::string effective_name = member.nickname, effective_avatar = member.get_avatar_url();
 
-    Command::reply(event, dpp::embed()
-            .set_color(colors::GREEN)
-            .add_field("Niveau " + std::to_string(level), Pages::to_progress_bar(level, xp, 14), false)
-            .set_author("Progression de " + effective_name, "", member.get_avatar_url())
+    if (member.get_user() == nullptr) {
+        dpp::user_identified user = Env::BOT.user_get_sync(user_id);
+        effective_name = user.username;
+        effective_avatar = user.get_avatar_url();
+    } else if (effective_avatar.empty())
+        effective_avatar = member.get_user()->get_avatar_url();
+
+    Commands::reply(event, dpp::embed()
+            .set_color(colors::BLUE)
+            .add_field(
+                    "Niveau " + std::to_string(level) + " • Rang " + std::to_string(rank),
+                    Pages::to_progress_bar(level, xp, 14),
+                    false
+            )
+            .set_author("Progression de " + effective_name, "", effective_avatar)
     );
 }
 
 
-void leaderboard_handler(const dpp::slashcommand_t &event) {
-    soci::rowset<soci::row> rows = (
-            Env::SQL.prepare << "SELECT id, level, xp, ROW_NUMBER() OVER (ORDER BY xp DESC) AS rank FROM users WHERE guild = ? LIMIT 10",
-                    soci::use(std::to_string(event.command.guild_id))
-    );
+void Commands::leaderboard_handler(const dpp::slashcommand_t &event) {
+    std::string guild_id = std::to_string(event.command.guild_id);
 
-    if (rows.begin() == rows.end())
-        return Command::reply(event, dpp::embed()
-                .set_color(colors::RED)
-                .set_description("❌ Le serveur n'a pas encore de membres enregistrés"), true
-        );
+    const soci::rowset<soci::row> rows = (
+            Env::SQL.prepare << "SELECT id, level, xp, ROW_NUMBER() OVER (ORDER BY xp DESC) AS rank FROM users WHERE guild = ? LIMIT 10",
+                    soci::use(guild_id)
+    );
 
     dpp::embed embed = dpp::embed()
             .set_color(colors::BLUE)
-            .set_footer("Page 1", "");
+            .set_footer("Page 1", "")
+            .set_author("Classement du serveur", "", event.command.get_guild().get_icon_url());
 
-    Pages::process_rows(rows,  embed);
-    Command::reply(event, embed);
+    if (!Pages::process_rows(rows,  embed))
+        return Commands::reply(event, dpp::embed()
+                .set_color(colors::RED)
+                .set_description("❌ Aucun membre n'est enregistré ou n'a jamais parlé"), true
+        );
 
+    Commands::reply(event, embed);
     event.get_original_response([](const dpp::confirmation_callback_t &callback) {
         if (callback.is_error())
             return;
@@ -64,13 +76,3 @@ void leaderboard_handler(const dpp::slashcommand_t &event) {
         Pages::create(get<dpp::message>(callback.value));
     });
 }
-
-
-Command level = Command("rang", "Commande de base pour les niveaux")
-        .add_subcommand(
-                Subcommand("perso", "Afficher la progression d'un membre", rank_handler)
-                .add_option(dpp::co_user, "membre", "Membre à afficher", false)
-        )
-        .add_subcommand(
-                Subcommand("global", "Afficher le classement du serveur", leaderboard_handler)
-        );

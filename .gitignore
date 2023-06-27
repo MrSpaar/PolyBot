@@ -1,6 +1,6 @@
-.env
-database.db
-.idea/
-libs/
-cmake-build-run/
-cmake-build-debug/
+/cmake-build-run/
+/.idea/
+/libs/
+/data/
+/data/database.db
+/.env

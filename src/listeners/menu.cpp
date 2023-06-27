@@ -2,22 +2,25 @@
 // Created by mrspaar on 3/30/23.
 //
 
-#include "commands.h"
+#include "listeners.h"
 
 
-Listener<dpp::button_click_t> bch(&Env::BOT.on_button_click, [](const auto &event) {
-    std::string role_id = event.custom_id;
-    dpp::embed embed = dpp::embed()
-            .set_color(colors::RED)
-            .set_description("Erreur dans la récupération du rôle");
+void Listeners::onButtonClick(const dpp::button_click_t &event) {
+    Env::BOT.guild_get_member(event.command.guild_id, event.command.usr.id, [event](const auto &callback) {
+        dpp::message msg;
+        msg.flags = dpp::m_ephemeral;
 
-    Env::BOT.guild_get_member(event.command.guild_id, event.command.usr.id, [&](const auto &callback) {
         if (callback.is_error())
-            return event.reply(dpp::message().add_embed(embed));
+            return event.reply(msg.add_embed(dpp::embed()
+                    .set_color(colors::RED)
+                    .set_description("Erreur dans la récupération du rôle")
+            ));
 
+        dpp::embed embed;
+        std::string role_id = event.custom_id;
         dpp::guild_member member = std::get<dpp::guild_member>(callback.value);
 
-        if (std::find(member.roles.begin(), member.roles.end(), role_id) != member.roles.end()) {
+        if (std::find(member.roles.begin(), member.roles.end(), role_id) == member.roles.end()) {
             Env::BOT.guild_member_add_role(event.command.guild_id, event.command.usr.id, role_id);
             embed.set_color(colors::GREEN).set_description("Rôle <@&" + role_id + "> ajouté");
         } else {
@@ -25,40 +28,37 @@ Listener<dpp::button_click_t> bch(&Env::BOT.on_button_click, [](const auto &even
             embed.set_color(colors::RED).set_description("Rôle <@&" + role_id + "> retiré");
         }
 
-        event.reply(dpp::message().add_embed(embed));
+        msg.add_embed(embed);
+        event.reply(msg);
     });
-});
+}
 
 
-Listener<dpp::select_click_t> sch(&Env::BOT.on_select_click, [](const auto &event) {
-    std::string role_id = event.values[0];
-    dpp::embed embed = dpp::embed()
-            .set_color(colors::RED)
-            .set_description("Erreur dans la récupération du rôle");
+void Listeners::onSelectClick(const dpp::select_click_t &event) {
+    Env::BOT.guild_get_member(event.command.guild_id, event.command.usr.id, [event](const auto &callback) {
+        dpp::message msg;
+        msg.flags = dpp::m_ephemeral;
 
-    event.get_original_response([&](const auto &callback) {
         if (callback.is_error())
-            return;
-
-        dpp::message msg = std::get<dpp::message>(callback.value);
-        dpp::component select = msg.components[0];
-
-        Env::BOT.guild_get_member(event.command.guild_id, event.command.usr.id, [&](const auto &callback) {
-            if (callback.is_error())
-                return event.reply(dpp::message().add_embed(embed));
-
-            dpp::guild_member member = std::get<dpp::guild_member>(callback.value);
-
-            for (const dpp::component &component: select.components)
-                if (std::find(member.roles.begin(), member.roles.end(), component.custom_id) != member.roles.end())
-                    return event.reply(dpp::message().add_embed(embed));
-
-            Env::BOT.guild_member_add_role(event.command.guild_id, event.command.usr.id, role_id);
-
-            event.reply(dpp::message().add_embed(embed
-                    .set_color(colors::GREEN)
-                    .set_description("Rôle " + select.components[0].label + " ajouté")
+            return event.reply(msg.add_embed(dpp::embed()
+                    .set_color(colors::RED)
+                    .set_description("Erreur dans la récupération du rôle")
             ));
-        });
+
+        std::string role_id = event.values[0];
+        dpp::guild_member member = std::get<dpp::guild_member>(callback.value);
+
+        if (std::find(member.roles.begin(), member.roles.end(), role_id) != member.roles.end())
+            return event.reply(msg.add_embed(dpp::embed()
+                    .set_color(colors::RED)
+                    .set_description("Vous avez déjà ce rôle")
+            ));
+
+        Env::BOT.guild_member_add_role(event.command.guild_id, event.command.usr.id, role_id);
+
+        event.reply(msg.add_embed(dpp::embed()
+                .set_color(colors::GREEN)
+                .set_description("Rôle <@&" + role_id + "> ajouté")
+        ));
     });
-});
+}

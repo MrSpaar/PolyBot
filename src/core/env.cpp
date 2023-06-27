@@ -12,18 +12,20 @@ void Env::load(const std::string &path) {
         throw std::runtime_error("Could not open file: " + path);
 
     std::string line;
+    unsigned long pos;
+    bool is_string;
+
     while (std::getline(file, line)) {
         if (line.empty() || line[0] == '#')
             continue;
 
-        auto pos = line.find('=');
-        if (pos == std::string::npos)
+        if ((pos = line.find('=')) == std::string::npos)
             continue;
 
-        if (line[pos + 1] == '"' && line[line.size() - 1] != '"')
+        if ((is_string = line[pos + 1] == '"') && line[line.size() - 1] != '"')
             throw std::runtime_error("Parsing error: " + line);
 
-        if (line[pos + 1] == '"')
+        if (is_string)
             env[line.substr(0, pos)] = line.substr(pos + 2, line.size() - pos - 3);
         else
             env[line.substr(0, pos)] = line.substr(pos + 1);
@@ -47,29 +49,12 @@ void Env::init(const std::string &token, const std::string &db_path) {
     ");";
 
     SQL << "CREATE TABLE IF NOT EXISTS users ("
-           "id STRING, "
-           "guild STRING, "
-           "xp INTEGER, "
-           "level INTEGER, "
+           "id TEXT, "
+           "guild TEXT, "
+           "xp INTEGER DEFAULT 0, "
+           "level INTEGER DEFAULT 0, "
 
            "PRIMARY KEY (id, guild),"
            "FOREIGN KEY (guild) REFERENCES guilds(id) ON DELETE CASCADE"
     ");";
-
-    SQL << "CREATE TABLE IF NOT EXISTS pending ("
-           "guild STRING, "
-           "user STRING, "
-           "voice_channel STRING, "
-           "text_channel STRING, "
-
-           "PRIMARY KEY (guild, user)"
-    ");";
-}
-
-
-std::string &Env::get(const std::string &key) {
-    if (!env.contains(key))
-        throw std::runtime_error("Key not found: " + key);
-
-    return env[key];
 }

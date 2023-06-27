@@ -5,53 +5,75 @@
 #ifndef POLYBOT_COMMAND_H
 #define POLYBOT_COMMAND_H
 
-#include <string>
 #include "env.h"
-
-
-namespace colors {
-    const uint32_t GREEN = 0x2ECC71;
-    const uint32_t ORANGE = 0xC27C0E;
-    const uint32_t RED = 0xE74C3C;
-    const uint32_t BLUE = 0x3498DB;
-    const uint32_t GOLD = 0xF1C40F;
-}
-
-
-static std::vector<dpp::slashcommand> TO_BUILD;
 typedef void (*slash_handler)(const dpp::slashcommand_t&);
 
 
-class Subcommand {
-public:
-    explicit Subcommand(const std::string& name, const std::string &description, slash_handler handler);
+namespace Commands {
+    void bind();
 
-    [[nodiscard]] dpp::command_option get_option() const;
-    Subcommand &add_option(const dpp::command_option_type &type, const std::string &name, const std::string &description, bool required = false);
+    inline void reply(const dpp::slashcommand_t &event, const dpp::embed& embed, bool ephemeral = false) {
+        dpp::message msg = dpp::message(event.command.channel_id, embed);
+        msg.flags = ephemeral ? dpp::m_ephemeral : 0;
+        event.reply(msg);
+    }
+
+    void logs_handler(const dpp::slashcommand_t &event);
+    void welcome_handler(const dpp::slashcommand_t &event);
+    void newcomer_handler(const dpp::slashcommand_t &event);
+    void announce_handler(const dpp::slashcommand_t &event);
+    void rank_handler(const dpp::slashcommand_t &event);
+    void leaderboard_handler(const dpp::slashcommand_t &event);
+    void buttons_handler(const dpp::slashcommand_t &event);
+    void select_handler(const dpp::slashcommand_t &event);
+    void kick_handler(const dpp::slashcommand_t &event);
+    void ban_handler(const dpp::slashcommand_t &event);
+    void unban_handler(const dpp::slashcommand_t &event);
+    void clear_handler(const dpp::slashcommand_t &event);
+    void twitch_handler(const dpp::slashcommand_t &event);
+    void wiki_handler(const dpp::slashcommand_t &event);
+}
+
+
+class Command: public dpp::slashcommand {
+public:
+    Command(const std::string& name, const std::string& description, slash_handler handler = nullptr) {
+        Env::TO_BUILD.emplace_back(name, description, 0);
+
+        if (handler != nullptr)
+            Env::BOT.on_slashcommand(Command::wrap(name, handler));
+    }
+
+    Command& add_subcommand(const std::string &name, const std::string &description, slash_handler handler, std::vector<dpp::command_option> options = {}) {
+        dpp::command_option subcommand(dpp::co_sub_command, name, description);
+        subcommand.options = std::move(options);
+        Env::TO_BUILD.back().add_option(subcommand);
+
+        if (handler != nullptr)
+            Env::BOT.on_slashcommand(Command::wrap(name, handler));
+
+        return *this;
+    }
+
+    Command& add_option(const dpp::command_option_type& type, const std::string& name, const std::string& description, bool required = true) {
+        Env::TO_BUILD.back().add_option(
+                dpp::command_option(type, name, description, required)
+        );
+
+        return *this;
+    }
 private:
-    dpp::command_option *sub_slash;
-};
+    static std::function<void(const dpp::slashcommand_t&)> wrap(const std::string& name, slash_handler handler) {
+        return [name, handler](const dpp::slashcommand_t &event) {
+            dpp::command_interaction command = event.command.get_command_interaction();
 
+            if (!command.options.empty() && command.options[0].name == name)
+                return handler(event);
 
-class Command {
-public:
-    explicit Command(const std::string& name, const std::string &description, slash_handler handler = nullptr);
-
-    Command &add_subcommand(const Subcommand& subcommand);
-    Command &add_option(const dpp::command_option_type &type, const std::string &name, const std::string &description, bool required = false);
-
-    static void reply(const dpp::slashcommand_t &event, const dpp::embed &embed, bool ephemeral = false);
-private:
-    dpp::slashcommand *slash;
-};
-
-
-template<typename T>
-class Listener {
-public:
-    Listener(dpp::event_router_t<T> *router, void (*handler)(const T&)) {
-        router->attach(handler);
-    };
+            if (command.name == name)
+                return handler(event);
+        };
+    }
 };
 
 

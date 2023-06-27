@@ -5,7 +5,7 @@
 #include <random>
 
 #include "pages.h"
-#include "commands.h"
+#include "listeners.h"
 
 
 std::map<dpp::snowflake, time_t> cooldowns;
@@ -15,7 +15,7 @@ std::default_random_engine generator(rd());
 std::uniform_int_distribution<int> distribution(15, 25);
 
 
-Listener<dpp::message_create_t> mch(&Env::BOT.on_message_create, [](const dpp::message_create_t &event) {
+void Listeners::onMessageCreate(const dpp::message_create_t &event) {
     if (event.msg.author.is_bot() || event.msg.author.is_system())
         return;
 
@@ -25,9 +25,11 @@ Listener<dpp::message_create_t> mch(&Env::BOT.on_message_create, [](const dpp::m
     cooldowns[event.msg.author.id] = time(nullptr) + 60;
 
     int level, xp;
-    Env::SQL << "SELECT level, xp FROM users WHERE user_id = ? AND guild_id = ?",
-            soci::use(uint64_t(event.msg.author.id)), soci::use(uint64_t(event.msg.guild_id)),
-            soci::into(level), soci::into(xp);
+    std::string guild_id = std::to_string(event.msg.guild_id);
+    std::string user_id = std::to_string(event.msg.author.id);
+
+    Env::SQL << "SELECT level, xp FROM users WHERE id = ? AND guild = ?",
+            soci::use(user_id), soci::use(guild_id), soci::into(level), soci::into(xp);
 
     xp += distribution(generator);
     double next_cap = 5.0/6 * (level+1) * (2*(level+1)*(level+1) + 27*(level+1) + 91);
@@ -35,23 +37,24 @@ Listener<dpp::message_create_t> mch(&Env::BOT.on_message_create, [](const dpp::m
     if (xp >= next_cap) {
         level++;
 
-        uint64_t channel_id;
-        Env::SQL << "SELECT channel_id FROM guilds WHERE guild_id = ?",
-                soci::use(uint64_t(event.msg.guild_id)), soci::into(channel_id);
+        std::string channel_id;
+        Env::SQL << "SELECT announce_channel FROM guilds WHERE id = ?", soci::use(guild_id), soci::into(channel_id);
 
-        if (channel_id != 0)
+        if (!channel_id.empty())
             Env::BOT.message_create(dpp::message(channel_id, dpp::embed()
                     .set_color(colors::GOLD)
-                    .set_description("\\uD83C\\uDD99 " + event.msg.author.get_mention() + " vient de passer au niveau " + std::to_string(level) + " !")
+                    .set_description(
+                            "\\uD83C\\uDD99 " + event.msg.author.get_mention() + " vient de passer au niveau " + std::to_string(level) + " !"
+                    )
             ));
     }
 
-    Env::SQL << "UPDATE users SET level = ?, xp = ? WHERE user_id = ? AND guild_id = ?",
-            soci::use(level), soci::use(xp), soci::use(uint64_t(event.msg.author.id)), soci::use(uint64_t(event.msg.guild_id));
-});
+    Env::SQL << "UPDATE users SET level = ?, xp = ? WHERE id = ? AND guild = ?",
+            soci::use(level), soci::use(xp), soci::use(user_id), soci::use(guild_id);
+}
 
 
-Listener<dpp::message_reaction_add_t> mrah(&Env::BOT.on_message_reaction_add, [](const dpp::message_reaction_add_t &event) {
+void Listeners::onReactionAdd(const dpp::message_reaction_add_t &event) {
     if (event.reacting_user.is_bot() || event.reacting_user.is_system())
         return;
 
@@ -59,22 +62,18 @@ Listener<dpp::message_reaction_add_t> mrah(&Env::BOT.on_message_reaction_add, []
     if (page == nullptr)
         return;
 
-    int total_entries;
-    Env::SQL << "SELECT COUNT(*) FROM users WHERE guild_id = ?",
-            soci::use(uint64_t(event.reacting_guild->id)), soci::into(total_entries);
-
-    int next_page = page->increment(total_entries / 10 + 1, event.reacting_emoji.name == "➡️");
+    std::string guild_id = std::to_string(event.reacting_guild->id);
+    int next_page = page->increment(guild_id, event.reacting_emoji.name);
 
     soci::rowset<soci::row> rows = (
-            Env::SQL.prepare << "SELECT ROW_NUMBER() OVER (ORDER BY xp DESC) as rank, user_id, level, xp"
-                                   "FROM users WHERE guild_id=:id LIMIT 10 OFFSET :offser",
-                    soci::use(uint64_t(event.reacting_guild->id), "id"), soci::use(next_page * 10, "offset")
+            Env::SQL.prepare << "SELECT id, level, xp, ROW_NUMBER() OVER (ORDER BY xp DESC) as rank "
+                                "FROM users WHERE guild = ? LIMIT 10 OFFSET " << next_page*10, soci::use(guild_id)
     );
 
     dpp::embed embed = dpp::embed()
             .set_color(colors::BLUE)
-            .set_footer("Page " + std::to_string(next_page), "");
+            .set_footer("Page " + std::to_string(next_page+1), "");
 
     Pages::process_rows(rows, embed);
-    page->update(embed);
-});
+    page->update(embed, event.reacting_user.id, event.reacting_emoji);
+}

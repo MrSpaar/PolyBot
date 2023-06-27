@@ -14,13 +14,21 @@ class Pages {
 public:
     explicit Pages(const dpp::message& message, int page_num = 0);
 
-    static Pages* get(dpp::snowflake id);
-    static void create(const dpp::message& message);
-    static std::string to_progress_bar(int level, int xp, int length);
-    static void process_rows(const soci::rowset<soci::row> &rows, dpp::embed& embed);
+    static inline Pages* get(dpp::snowflake id) {
+        if (CACHE.contains(id))
+            return CACHE[id];
+        return nullptr;
+    }
 
-    void update(const dpp::embed& embed);
-    int increment(int total_pages, bool plus);
+    static inline void create(const dpp::message& message) {
+        CACHE[message.id] = new Pages(message);
+    }
+
+    static std::string to_progress_bar(int level, int xp, int length);
+    static bool process_rows(const soci::rowset<soci::row> &rows, dpp::embed& embed);
+
+    int increment(const std::string &guild_id, const std::string &emoji);
+    void update(const dpp::embed& embed, const dpp::snowflake &user, const dpp::emoji &emoji);
 private:
     int page_num;
     dpp::message message;

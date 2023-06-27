@@ -19,17 +19,18 @@ add_subdirectory(libs/DPP)
 list(APPEND LIBS soci_core soci_sqlite3 dpp curl)
 
 add_executable(${PROJECT_NAME}
-        src/main.cpp
+        src/main.cpp includes/listeners.h
         includes/env.h src/core/env.cpp
-        includes/commands.h src/core/commands.cpp
+        includes/commands.h
         includes/request.h src/core/request.cpp
         includes/pages.h src/core/pages.cpp
 
-        src/commands/search.cpp src/commands/music.cpp
+        src/commands/search.cpp
         src/commands/moderation.cpp src/commands/config.cpp
         src/commands/menu.cpp src/listeners/menu.cpp
         src/commands/levels.cpp src/listeners/levels.cpp
-        src/listeners/logs.cpp src/listeners/channels.cpp )
+        src/listeners/logs.cpp src/listeners/channels.cpp
+        src/listeners/ready.cpp)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE ${LIBS})
 target_include_directories(${PROJECT_NAME} PRIVATE ${LIBS})
