@@ -1,24 +1,25 @@
 FROM debian:latest
 
-RUN apt update && apt upgrade
+RUN apt-get update && apt-get upgrade
 
-RUN apt install sqlite-libs
-RUN apt install add bash curl git jq wget make cmake g++ \
-        opus-dev libsodium-dev zlib-dev openssl-dev curl-dev sqlite-dev
+RUN apt-get install curl git jq wget make cmake g++ \
+        libopus-dev libsodium-dev zlib1g-dev libssl-dev libcurl4-openssl-dev libsqlite3-dev -y
 
 WORKDIR /app
 COPY ./includes ./includes
 COPY ./src ./src
 COPY ./CMakeLists.txt ./CMakeLists.txt
 COPY ./.env ./.env
-COPY data/database.db ./database.db
+COPY ./data/database.db ./data/database.db
 
 RUN mkdir libs
 RUN git clone https://github.com/SOCI/soci.git libs/soci
 
-RUN curl -sL "https://api.github.com/repos/brainboxdotcc/DPP/releases/latest" \
-            | jq -r "linux-x64.deb" \
-            | wget -q -O DPP.deb -i - \
+RUN curl -s "https://api.github.com/repos/brainboxdotcc/DPP/releases/latest" \
+            | grep "browser_download_url.*linux-x64.deb" \
+            | cut -d : -f 2,3 \
+            | tr -d \" \
+            | wget -qi - -O DPP.deb \
             || (printf "Error: Failed to download DPP\n" && exit) \
             && dpkg -i DPP.deb \
             && rm DPP.deb
