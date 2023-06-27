@@ -44,7 +44,7 @@ void Listeners::onMessageCreate(const dpp::message_create_t &event) {
             Env::BOT.message_create(dpp::message(channel_id, dpp::embed()
                     .set_color(colors::GOLD)
                     .set_description(
-                            "\\uD83C\\uDD99 " + event.msg.author.get_mention() + " vient de passer au niveau " + std::to_string(level) + " !"
+                            ":tada: " + event.msg.author.get_mention() + " vient de passer au niveau " + std::to_string(level) + " !"
                     )
             ));
     }
