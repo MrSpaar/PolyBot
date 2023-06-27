@@ -101,7 +101,7 @@ void Commands::clear_handler(const dpp::slashcommand_t &event) {
         for (auto &[snowflake, message]: messages)
             to_delete.push_back(snowflake);
 
-        Env::BOT.message_delete_bulk(to_delete, channel_id, [&](const dpp::confirmation_callback_t &callback) {
+        Env::BOT.message_delete_bulk(to_delete, channel_id, [event, to_delete](const dpp::confirmation_callback_t &callback) {
             if (callback.is_error()) {
                 std::cout << callback.http_info.body << std::endl;
 
