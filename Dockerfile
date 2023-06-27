@@ -1,6 +1,6 @@
 FROM debian:latest
 
-RUN apt update && apk upgrade
+RUN apt update && apt upgrade
 
 RUN apt install sqlite-libs
 RUN apt install add bash curl git jq wget make cmake g++ \
