@@ -1,7 +1,6 @@
 #include "commands.h"
 #include "listeners.h"
 
-
 void Listeners::bind() {
     Env::BOT.on_ready(onReady);
     Env::BOT.on_button_click(onButtonClick);
@@ -75,6 +74,23 @@ int main() {
     Env::load();
     Env::init(Env::get("DISCORD_TOKEN"), Env::get("DB_PATH"));
 
+    Env::SQL << "CREATE TABLE IF NOT EXISTS guilds ("
+           "    id STRING PRIMARY KEY NOT NULL,"
+           "    announce_channel TEST,"
+           "    logs_channel TEXT,"
+           "    newcomer_role TEXT,"
+           "    welcome_channel TEXT,"
+           "    welcome_message TEXT"
+           ");";
+
+    Env::SQL << "CREATE TABLE IF NOT EXISTS users ("
+           "    id STRING PRIMARY KEY NOT NULL,"
+           "    guild STRING PRIMARY KEY NOT NULL,"
+           "    xp INTEGER NOT NULL DEFAULT 0,"
+           "    level INTEGER NOT NULL DEFAULT 0"
+           ");";
+
+    Env::SQL.good();
     Listeners::bind();
     Commands::bind();
 

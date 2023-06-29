@@ -24,12 +24,15 @@ void Listeners::onMessageCreate(const dpp::message_create_t &event) {
 
     cooldowns[event.msg.author.id] = time(nullptr) + 60;
 
-    int level, xp;
     std::string guild_id = std::to_string(event.msg.guild_id);
     std::string user_id = std::to_string(event.msg.author.id);
 
-    Env::SQL << "SELECT level, xp FROM users WHERE id = ? AND guild = ?",
-            soci::use(user_id), soci::use(guild_id), soci::into(level), soci::into(xp);
+    Env::SQL << "SELECT level, xp FROM users WHERE id = ? AND guild = ?", user_id, guild_id;
+    if (!Env::SQL.good())
+        return;
+
+    auto xp = Env::SQL.get<int>("xp");
+    auto level = Env::SQL.get<int>("level");
 
     xp += distribution(generator);
     double next_cap = 5.0/6 * (level+1) * (2*(level+1)*(level+1) + 27*(level+1) + 91);
@@ -37,20 +40,20 @@ void Listeners::onMessageCreate(const dpp::message_create_t &event) {
     if (xp >= next_cap) {
         level++;
 
-        std::string channel_id;
-        Env::SQL << "SELECT announce_channel FROM guilds WHERE id = ?", soci::use(guild_id), soci::into(channel_id);
+        Env::SQL << "SELECT announce_channel FROM guilds WHERE id = ?", guild_id;
+        if (!Env::SQL.good())
+            return;
 
-        if (!channel_id.empty())
-            Env::BOT.message_create(dpp::message(channel_id, dpp::embed()
-                    .set_color(colors::GOLD)
-                    .set_description(
-                            ":tada: " + event.msg.author.get_mention() + " vient de passer au niveau " + std::to_string(level) + " !"
-                    )
-            ));
+        auto channel_id = Env::SQL.get<std::string>("announce_channel");
+        Env::BOT.message_create(dpp::message(channel_id, dpp::embed()
+                .set_color(colors::GOLD)
+                .set_description(
+                        ":tada: " + event.msg.author.get_mention() + " vient de passer au niveau " + std::to_string(level) + " !"
+                )
+        ));
     }
 
-    Env::SQL << "UPDATE users SET level = ?, xp = ? WHERE id = ? AND guild = ?",
-            soci::use(level), soci::use(xp), soci::use(user_id), soci::use(guild_id);
+    Env::SQL << "UPDATE users SET level = ?, xp = ? WHERE id = ? AND guild = ?", level, xp, user_id, guild_id;
 }
 
 
@@ -65,15 +68,16 @@ void Listeners::onReactionAdd(const dpp::message_reaction_add_t &event) {
     std::string guild_id = std::to_string(event.reacting_guild->id);
     int next_page = page->increment(guild_id, event.reacting_emoji.name);
 
-    soci::rowset<soci::row> rows = (
-            Env::SQL.prepare << "SELECT id, level, xp, ROW_NUMBER() OVER (ORDER BY xp DESC) as rank "
-                                "FROM users WHERE guild = ? LIMIT 10 OFFSET " << next_page*10, soci::use(guild_id)
-    );
+    Env::SQL << "SELECT id, level, xp, ROW_NUMBER() OVER (ORDER BY xp DESC) as rank "
+                "FROM users WHERE guild = ? LIMIT 10 OFFSET ?", guild_id, next_page*10;
+
+    if (!Env::SQL.good())
+        return;
 
     dpp::embed embed = dpp::embed()
             .set_color(colors::BLUE)
             .set_footer("Page " + std::to_string(next_page+1), "");
 
-    Pages::process_rows(rows, embed);
+    Pages::process_rows(embed);
     page->update(embed, event.reacting_user.id, event.reacting_emoji);
 }

@@ -8,14 +8,45 @@
 #include <map>
 #include <string>
 #include <dpp/dpp.h>
-#include <soci/soci.h>
-#include <soci/sqlite3/soci-sqlite3.h>
+
+#include "sqlite.h"
 
 
 class Env {
 public:
-    static void load(const std::string &path = "../.env");
-    static void init(const std::string &token, const std::string &db_path);
+    static void load(const std::string &path = "../.env") {
+        std::ifstream file(path);
+
+        if (!file.is_open())
+            throw std::runtime_error("Could not open file: " + path);
+
+        std::string line;
+        unsigned long pos;
+        bool is_string;
+
+        while (std::getline(file, line)) {
+            if (line.empty() || line[0] == '#')
+                continue;
+
+            if ((pos = line.find('=')) == std::string::npos)
+                continue;
+
+            if ((is_string = line[pos + 1] == '"') && line[line.size() - 1] != '"')
+                throw std::runtime_error("Parsing error: " + line);
+
+            if (is_string)
+                env[line.substr(0, pos)] = line.substr(pos + 2, line.size() - pos - 3);
+            else
+                env[line.substr(0, pos)] = line.substr(pos + 1);
+        }
+
+        file.close();
+    }
+
+    static void init(const std::string &token, const std::string &dbPath) {
+        BOT.token = token;
+        SQL.init(dbPath);
+    }
 
     static inline std::string& get(const std::string &key) {
         if (!env.contains(key))
@@ -24,8 +55,8 @@ public:
         return env[key];
     }
 
+    static inline SQLite SQL{};
     static inline dpp::cluster BOT{""};
-    static inline soci::session SQL;
     static inline std::vector<dpp::slashcommand> TO_BUILD{};
 private:
     static inline std::map<std::string, std::string> env{};
