@@ -8,7 +8,7 @@ RUN curl -s "https://api.github.com/repos/brainboxdotcc/DPP/releases/latest" \
             | grep "browser_download_url.*linux-x64.deb" \
             | cut -d : -f 2,3 \
             | tr -d \" \
-            | wget -qi https://github.com/brainboxdotcc/DPP/releases/download/v10.0.24/libdpp-10.0.24-linux-x64.deb -O DPP.deb \
+            | wget -qi - -O DPP.deb \
             || (printf "Error: Failed to download DPP\n" && exit) \
             && dpkg -i DPP.deb \
             && rm DPP.deb
