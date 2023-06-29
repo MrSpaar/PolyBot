@@ -27,7 +27,7 @@ void Listeners::onMessageCreate(const dpp::message_create_t &event) {
     std::string guild_id = std::to_string(event.msg.guild_id);
     std::string user_id = std::to_string(event.msg.author.id);
 
-    Env::SQL << "SELECT level, xp FROM users WHERE id = ? AND guild = ?", user_id, guild_id;
+    Env::SQL << "SELECT level, xp FROM users WHERE id = ? AND guild = ?", user_id, guild_id, std::endl;
     if (!Env::SQL.good())
         return;
 
@@ -40,7 +40,7 @@ void Listeners::onMessageCreate(const dpp::message_create_t &event) {
     if (xp >= next_cap) {
         level++;
 
-        Env::SQL << "SELECT announce_channel FROM guilds WHERE id = ?", guild_id;
+        Env::SQL << "SELECT announce_channel FROM guilds WHERE id = ?", guild_id, std::endl;
         if (!Env::SQL.good())
             return;
 
@@ -53,7 +53,7 @@ void Listeners::onMessageCreate(const dpp::message_create_t &event) {
         ));
     }
 
-    Env::SQL << "UPDATE users SET level = ?, xp = ? WHERE id = ? AND guild = ?", level, xp, user_id, guild_id;
+    Env::SQL << "UPDATE users SET level = ?, xp = ? WHERE id = ? AND guild = ?", level, xp, user_id, guild_id, std::endl;
 }
 
 
@@ -69,7 +69,7 @@ void Listeners::onReactionAdd(const dpp::message_reaction_add_t &event) {
     int next_page = page->increment(guild_id, event.reacting_emoji.name);
 
     Env::SQL << "SELECT id, level, xp, ROW_NUMBER() OVER (ORDER BY xp DESC) as rank "
-                "FROM users WHERE guild = ? LIMIT 10 OFFSET ?", guild_id, next_page*10;
+                "FROM users WHERE guild = ? LIMIT 10 OFFSET ?", guild_id, next_page*10, std::endl;
 
     if (!Env::SQL.good())
         return;

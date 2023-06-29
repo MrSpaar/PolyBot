@@ -17,20 +17,17 @@ void Commands::rank_handler(const dpp::slashcommand_t &event) {
     std::string guild_id = std::to_string(event.command.guild_id);
     Env::SQL << "SELECT level, xp, rank FROM ("
                     "   SELECT level, xp, id, ROW_NUMBER() OVER (ORDER BY xp DESC) AS rank FROM users WHERE guild = ?"
-                    ") WHERE id = ?", guild_id, user_id;
+                    ") WHERE id = ?;", guild_id, user_id, std::endl;
 
     if (!Env::SQL.good())
-        return;
-
-    auto xp = Env::SQL.get<int>("xp");
-    auto level = Env::SQL.get<int>("level");
-    auto rank = Env::SQL.get<int>("rank");
-
-    if (xp == 0)
         return Commands::reply(event, dpp::embed()
                 .set_color(colors::RED)
                 .set_description("❌ L'utilisateur n'est pas enregistré ou n'a jamais parlé"), true
         );
+
+    auto xp = Env::SQL.get<int>("xp");
+    auto level = Env::SQL.get<int>("level");
+    auto rank = Env::SQL.get<int>("rank");
 
     dpp::guild_member member = has_param ? event.command.get_resolved_member(user_id) : event.command.member;
     std::string effective_name = member.nickname, effective_avatar = member.get_avatar_url();
@@ -57,7 +54,7 @@ void Commands::rank_handler(const dpp::slashcommand_t &event) {
 void Commands::leaderboard_handler(const dpp::slashcommand_t &event) {
     std::string guild_id = std::to_string(event.command.guild_id);
 
-    Env::SQL << "SELECT id, level, xp, ROW_NUMBER() OVER (ORDER BY xp DESC) AS rank FROM users WHERE guild = ? LIMIT 10", guild_id;
+    Env::SQL << "SELECT id, level, xp, ROW_NUMBER() OVER (ORDER BY xp DESC) AS rank FROM users WHERE guild = ? LIMIT 10;", guild_id, std::endl;
     if (!Env::SQL.good())
         return Commands::reply(event, dpp::embed()
                 .set_color(colors::RED)

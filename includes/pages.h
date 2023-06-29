@@ -72,7 +72,7 @@ public:
     }
 
     int increment(const std::string &guild_id, const std::string &emoji) {
-        Env::SQL << "SELECT COUNT(*) AS count FROM users WHERE guild = ?", guild_id;
+        Env::SQL << "SELECT COUNT(*) AS count FROM users WHERE guild = ?", guild_id, std::endl;
         if (!Env::SQL.good())
             return 0;
 
