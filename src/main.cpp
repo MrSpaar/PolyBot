@@ -90,7 +90,6 @@ int main() {
            "    level INTEGER NOT NULL DEFAULT 0"
            ");", std::endl;
 
-    Env::SQL.good();
     Listeners::bind();
     Commands::bind();
 

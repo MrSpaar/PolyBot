@@ -7,4 +7,5 @@ services:
         dockerfile: Dockerfile
     image: polybot
     volumes:
-      - ./data/database.db:/app/database.db:Z
+      - ./data/database.db:/app/data/database.db:Z
+      - ./data/slash.json:/app/data/slash.json:Z
