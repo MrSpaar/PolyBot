@@ -12,7 +12,7 @@ void Commands::logs_handler(const dpp::slashcommand_t &event) {
     Env::SQL << "INSERT OR IGNORE INTO guilds (id) VALUES (?);", guild_id;
 
     if (subcommand.options.empty()) {
-        Env::SQL << "UPDATE guilds SET logs_channel = 0 WHERE id = ?", guild_id, std::endl;
+        Env::SQL << "UPDATE guilds SET logs_channel = 0 WHERE id = ?", guild_id, sqlite::run;
 
         return Commands::reply(event, dpp::embed()
                 .set_description("✒️ Les logs ont été désactivés")
@@ -21,7 +21,7 @@ void Commands::logs_handler(const dpp::slashcommand_t &event) {
     }
 
     std::string channel_id = std::to_string(subcommand.get_value<dpp::snowflake>(0));
-    Env::SQL << "UPDATE guilds SET logs_channel = ? WHERE id = ?", channel_id, guild_id, std::endl;
+    Env::SQL << "UPDATE guilds SET logs_channel = ? WHERE id = ?", channel_id, guild_id, sqlite::run;
 
     Commands::reply(event, dpp::embed()
             .set_description("✒️ Les logs seront envoyés dans <#" + channel_id + ">")
@@ -37,7 +37,7 @@ void Commands::welcome_handler(const dpp::slashcommand_t &event) {
     Env::SQL << "INSERT OR IGNORE INTO guilds (id) VALUES (?);", guild_id;
 
     if (subcommand.options.empty()) {
-        Env::SQL << "UPDATE guilds SET welcome_channel = 0, welcome_message = '' WHERE id = ?", guild_id, std::endl;
+        Env::SQL << "UPDATE guilds SET welcome_channel = 0, welcome_message = '' WHERE id = ?", guild_id, sqlite::run;
 
         return Commands::reply(event, dpp::embed()
                 .set_description("✒️ Les messages de bienvenue ont été désactivés")
@@ -47,7 +47,7 @@ void Commands::welcome_handler(const dpp::slashcommand_t &event) {
 
     std::string channel_id = std::to_string(subcommand.get_value<dpp::snowflake>(0));
     Env::SQL << "UPDATE guilds SET welcome_channel = ?, welcome_message = ? WHERE id = ?",
-                channel_id, subcommand.get_value<std::string>(1), guild_id, std::endl;
+                channel_id, subcommand.get_value<std::string>(1), guild_id, sqlite::run;
 
     Commands::reply(event, dpp::embed()
             .set_description("✒️ Le message de bienvenue sera envoyé dans <#" + channel_id + ">")
@@ -63,7 +63,7 @@ void Commands::newcomer_handler(const dpp::slashcommand_t &event) {
     Env::SQL << "INSERT OR IGNORE INTO guilds (id) VALUES (?);", guild_id;
 
     if (subcommand.options.empty()) {
-        Env::SQL << "UPDATE guilds SET newcomer_role = 0 WHERE id = ?", guild_id, std::endl;
+        Env::SQL << "UPDATE guilds SET newcomer_role = 0 WHERE id = ?", guild_id, sqlite::run;
 
         return Commands::reply(event, dpp::embed()
                 .set_description("✒️ Les nouveaux ne recevront plus de rôle")
@@ -72,7 +72,7 @@ void Commands::newcomer_handler(const dpp::slashcommand_t &event) {
     }
 
     std::string role_id = std::to_string(subcommand.get_value<dpp::snowflake>(0));
-    Env::SQL << "UPDATE guilds SET newcomer_role = ? WHERE id = ?", role_id, guild_id, std::endl;
+    Env::SQL << "UPDATE guilds SET newcomer_role = ? WHERE id = ?", role_id, guild_id, sqlite::run;
 
     Commands::reply(event, dpp::embed()
             .set_description("✒️ Les nouveaux recevront le rôle <@&" + role_id + ">")
@@ -88,7 +88,7 @@ void Commands::announce_handler(const dpp::slashcommand_t &event) {
     Env::SQL << "INSERT OR IGNORE INTO guilds (id) VALUES (?);", guild_id;
 
     if (subcommand.options.empty()) {
-        Env::SQL << "UPDATE guilds SET announce_channel = 0 WHERE id = ?", guild_id, std::endl;
+        Env::SQL << "UPDATE guilds SET announce_channel = 0 WHERE id = ?", guild_id, sqlite::run;
 
         return Commands::reply(event, dpp::embed()
                 .set_description("✒️ Les annonces de niveaux ont été désactivées")
@@ -97,7 +97,7 @@ void Commands::announce_handler(const dpp::slashcommand_t &event) {
     }
 
     std::string channel_id = std::to_string(subcommand.get_value<dpp::snowflake>(0));
-    Env::SQL << "UPDATE guilds SET announce_channel = ? WHERE id = ?", channel_id, guild_id, std::endl;
+    Env::SQL << "UPDATE guilds SET announce_channel = ? WHERE id = ?", channel_id, guild_id, sqlite::run;
 
     Commands::reply(event, dpp::embed()
             .set_description("✒️ Les annonces de niveaux seront envoyées dans <#" + channel_id + ">")

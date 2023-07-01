@@ -88,7 +88,7 @@ int main() {
            "    guild STRING PRIMARY KEY NOT NULL,"
            "    xp INTEGER NOT NULL DEFAULT 0,"
            "    level INTEGER NOT NULL DEFAULT 0"
-           ");", std::endl;
+           ");", sqlite::run;
 
     Listeners::bind();
     Commands::bind();

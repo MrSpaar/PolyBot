@@ -17,7 +17,7 @@ void Commands::rank_handler(const dpp::slashcommand_t &event) {
     std::string guild_id = std::to_string(event.command.guild_id);
     Env::SQL << "SELECT level, xp, rank FROM ("
                     "   SELECT level, xp, id, ROW_NUMBER() OVER (ORDER BY xp DESC) AS rank FROM users WHERE guild = ?"
-                    ") WHERE id = ?;", guild_id, user_id, std::endl;
+                    ") WHERE id = ?;", guild_id, user_id, sqlite::run;
 
     if (!Env::SQL.good())
         return Commands::reply(event, dpp::embed()
@@ -54,7 +54,9 @@ void Commands::rank_handler(const dpp::slashcommand_t &event) {
 void Commands::leaderboard_handler(const dpp::slashcommand_t &event) {
     std::string guild_id = std::to_string(event.command.guild_id);
 
-    Env::SQL << "SELECT id, level, xp, ROW_NUMBER() OVER (ORDER BY xp DESC) AS rank FROM users WHERE guild = ? LIMIT 10;", guild_id, std::endl;
+    Env::SQL << "SELECT id, level, xp, ROW_NUMBER() OVER (ORDER BY xp DESC) AS rank FROM users WHERE guild = ? LIMIT 10;",
+        guild_id, sqlite::run;
+
     if (!Env::SQL.good())
         return Commands::reply(event, dpp::embed()
                 .set_color(colors::RED)

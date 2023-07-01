@@ -13,6 +13,12 @@
 #include <sqlite3.h>
 
 
+namespace sqlite {
+    struct run_t{};
+    static inline run_t run{};
+}
+
+
 class SQLRow {
 public:
     template<typename T>
@@ -105,7 +111,7 @@ public:
         return *this;
     }
 
-    SQLite &operator,(std::ostream& (*)(std::ostream&)) {
+    SQLite &operator,(sqlite::run_t) {
         if (query.empty())
             return *this;
 
