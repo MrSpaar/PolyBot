@@ -58,7 +58,7 @@ public:
     static void process_rows(dpp::embed& embed) {
         std::string names, levels, progress;
 
-        for (SQLRow& row: Env::SQL.get()) {
+        for (SQLRow& row: Env::SQL) {
             auto level = row.get<int>("level");
 
             names += "**" + row.get<std::string>("rank") + ".** <@" + row.get<std::string>("id") + ">\n";
@@ -73,7 +73,7 @@ public:
 
     int increment(const std::string &guild_id, const std::string &emoji) {
         Env::SQL << "SELECT COUNT(*) AS count FROM users WHERE guild = ?", guild_id, sqlite::run;
-        if (!Env::SQL.good())
+        if (Env::SQL.empty())
             return 0;
 
         int total_pages = Env::SQL.get<int>("count") / 10 + 1;

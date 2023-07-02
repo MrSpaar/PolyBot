@@ -19,7 +19,7 @@ void Commands::rank_handler(const dpp::slashcommand_t &event) {
                     "   SELECT level, xp, id, ROW_NUMBER() OVER (ORDER BY xp DESC) AS rank FROM users WHERE guild = ?"
                     ") WHERE id = ?;", guild_id, user_id, sqlite::run;
 
-    if (!Env::SQL.good())
+    if (Env::SQL.empty())
         return Commands::reply(event, dpp::embed()
                 .set_color(colors::RED)
                 .set_description("❌ L'utilisateur n'est pas enregistré ou n'a jamais parlé"), true
@@ -57,7 +57,7 @@ void Commands::leaderboard_handler(const dpp::slashcommand_t &event) {
     Env::SQL << "SELECT id, level, xp, ROW_NUMBER() OVER (ORDER BY xp DESC) AS rank FROM users WHERE guild = ? LIMIT 10;",
         guild_id, sqlite::run;
 
-    if (!Env::SQL.good())
+    if (Env::SQL.empty())
         return Commands::reply(event, dpp::embed()
                 .set_color(colors::RED)
                 .set_description("❌ Aucun membre n'est enregistré ou n'a jamais parlé"), true

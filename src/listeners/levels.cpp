@@ -28,7 +28,7 @@ void Listeners::onMessageCreate(const dpp::message_create_t &event) {
     std::string user_id = std::to_string(event.msg.author.id);
 
     Env::SQL << "SELECT level, xp FROM users WHERE id = ? AND guild = ?", user_id, guild_id, sqlite::run;
-    if (!Env::SQL.good())
+    if (Env::SQL.empty())
         return;
 
     auto xp = Env::SQL.get<int>("xp");
@@ -41,7 +41,7 @@ void Listeners::onMessageCreate(const dpp::message_create_t &event) {
         level++;
 
         Env::SQL << "SELECT announce_channel FROM guilds WHERE id = ?", guild_id, sqlite::run;
-        if (!Env::SQL.good())
+        if (Env::SQL.empty())
             return;
 
         auto channel_id = Env::SQL.get<std::string>("announce_channel");
@@ -72,7 +72,7 @@ void Listeners::onReactionAdd(const dpp::message_reaction_add_t &event) {
     Env::SQL << "SELECT id, level, xp, ROW_NUMBER() OVER (ORDER BY xp DESC) as rank "
                 "FROM users WHERE guild = ? LIMIT 10 OFFSET ?", guild_id, next_page*10, sqlite::run;
 
-    if (!Env::SQL.good())
+    if (Env::SQL.empty())
         return;
 
     dpp::embed embed = dpp::embed()

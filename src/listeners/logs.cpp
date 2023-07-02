@@ -12,7 +12,7 @@ void Listeners::onGuildMemberAdd(const dpp::guild_member_add_t &event) {
     Env::SQL << "SELECT welcome_channel, welcome_message, logs_channel, newcomer_role FROM guilds WHERE id = ?",
             guild_id, sqlite::run;
 
-    if (!Env::SQL.good())
+    if (Env::SQL.empty())
         return;
 
     auto role_id = Env::SQL.get<std::string>("newcomer_role");
@@ -43,7 +43,7 @@ void Listeners::onGuildMemberRemove(const dpp::guild_member_remove_t &event) {
     Env::SQL << "DELETE FROM users WHERE id = ? AND guild = ?", std::to_string(event.removed->id), guild_id;
 
     Env::SQL << "SELECT logs_channel FROM guilds WHERE id = ?", guild_id, sqlite::run;
-    if (!Env::SQL.good())
+    if (Env::SQL.empty())
         return;
 
     auto log_channel_id = Env::SQL.get<std::string>("logs_channel");
@@ -61,7 +61,7 @@ void Listeners::onGuildBanAdd(const dpp::guild_ban_add_t &event) {
     Env::SQL << "DELETE FROM users WHERE id = ? AND guild = ?", std::to_string(event.banned.id), guild_id;
 
     Env::SQL << "SELECT logs_channel FROM guilds WHERE id = ?", guild_id, sqlite::run;
-    if (!Env::SQL.good())
+    if (Env::SQL.empty())
         return;
 
     auto log_channel_id = Env::SQL.get<std::string>("logs_channel");
@@ -76,7 +76,7 @@ void Listeners::onGuildBanAdd(const dpp::guild_ban_add_t &event) {
 
 void Listeners::onGuildBanRemove(const dpp::guild_ban_remove_t &event) {
     Env::SQL << "SELECT logs_channel FROM guilds WHERE id = ?", std::to_string(event.unbanning_guild->id), sqlite::run;
-    if (!Env::SQL.good())
+    if (Env::SQL.empty())
         return;
 
     auto log_channel_id = Env::SQL.get<std::string>("logs_channel");

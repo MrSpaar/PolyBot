@@ -21,6 +21,10 @@ namespace sqlite {
 
 class SQLRow {
 public:
+    void insert(const std::string &key, const std::string &value) {
+        data[key] = value;
+    }
+
     template<typename T>
     T get(const std::string &key) {
         if (data.find(key) == data.end()) {
@@ -35,16 +39,13 @@ public:
                 return std::stod(data[key]);
             else if constexpr (std::is_same_v<T, std::string>)
                 return data[key];
-            else
-                std::cerr << "Invalid type" << std::endl;
+
+            std::cerr << "Invalid type" << std::endl;
+            return T();
         } catch (std::exception &e) {
             std::cerr << "Could not cast value \"" << data[key] << "\" to type \"" << typeid(T).name() << "\"" << std::endl;
             return T();
         }
-    }
-
-    void insert(const std::string &key, const std::string &value) {
-        data[key] = value;
     }
 private:
     std::map<std::string, std::string> data;
@@ -54,30 +55,28 @@ private:
 class SQLResult {
 public:
     static int fetch(void* res, int argc, char **argv, char **col_name) {
-        if (res == nullptr)
-            return 0;
-
-        SQLRow row;
         auto *result = (SQLResult*) res;
+        result->data.emplace_back();
 
         for (int i = 0; i < argc; i++)
-            row.insert(col_name[i], argv[i]);
+            result->data.back().insert(col_name[i], argv[i] ? argv[i] : "NULL");
 
-        result->data.push_back(row);
         return 0;
     }
 
     SQLRow first() {
-        if (data.empty())
-            throw std::runtime_error("No data");
+        if (data.empty()) {
+            std::cerr << "No data" << std::endl;
+            return {};
+        }
 
         return data[0];
     }
 
     void clear() { data.clear(); }
-    [[nodiscard]] bool empty() { return data.empty(); }
     [[nodiscard]] auto begin() { return data.begin(); }
     [[nodiscard]] auto end() { return data.end(); }
+    [[nodiscard]] bool empty() const { return data.empty(); }
 private:
     std::vector<SQLRow> data;
 };
@@ -112,9 +111,6 @@ public:
     }
 
     SQLite &operator,(sqlite::run_t) {
-        if (query.empty())
-            return *this;
-
         result.clear();
         char *err_msg = nullptr;
         sqlite3_exec(db, query.c_str(), SQLResult::fetch, (void*) &result, &err_msg);
@@ -130,8 +126,10 @@ public:
 
     template<typename T>
     T get(const std::string &key) { return result.first().get<T>(key); }
-    SQLResult &get() { return result; }
-    bool good() { return !result.empty(); }
+
+    [[nodiscard]] auto begin() { return result.begin(); }
+    [[nodiscard]] auto end() { return result.end(); }
+    [[nodiscard]] bool empty() const { return result.empty(); }
 
     ~SQLite() { sqlite3_close(db); }
 private:
