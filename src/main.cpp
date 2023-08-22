@@ -84,6 +84,7 @@ int main() {
             .add_option(dpp::co_integer, "nombre", "Le nombre de messages à supprimer (2 à 100)", true);
 
     Env::BOT.intents = dpp::i_default_intents | dpp::i_guild_members;
+    Env::BOT.set_presence(dpp::presence(dpp::ps_online, dpp::at_game, "vous observer"));
     Env::BOT.start(dpp::st_wait);
     return 0;
 }
