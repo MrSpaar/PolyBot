@@ -49,7 +49,7 @@ dpp::embed fetch_streams(const std::string &category, const std::string &limit, 
 }
 
 
-void Commands::twitch_handler(const dpp::slashcommand_t &event) {
+void Commands::twitchHandler(const dpp::slashcommand_t &event) {
     auto subcommand = event.command.get_command_interaction().options[0];
     std::string category = subcommand.get_value<std::string>(0);
 
@@ -85,7 +85,7 @@ void Commands::twitch_handler(const dpp::slashcommand_t &event) {
 }
 
 
-void Commands::wiki_handler(const dpp::slashcommand_t &event) {
+void Commands::wikiHandler(const dpp::slashcommand_t &event) {
     auto subcommand = event.command.get_command_interaction().options[0];
     std::string title = subcommand.get_value<std::string>(0);
 

@@ -5,7 +5,7 @@
 #include "commands.h"
 
 
-void Commands::logs_handler(const dpp::slashcommand_t &event) {
+void Commands::logsHandler(const dpp::slashcommand_t &event) {
     auto subcommand = event.command.get_command_interaction().options[0];
 
     std::string guild_id = std::to_string(event.command.guild_id);
@@ -30,7 +30,7 @@ void Commands::logs_handler(const dpp::slashcommand_t &event) {
 }
 
 
-void Commands::welcome_handler(const dpp::slashcommand_t &event) {
+void Commands::welcomeHandler(const dpp::slashcommand_t &event) {
     auto subcommand = event.command.get_command_interaction().options[0];
 
     std::string guild_id = std::to_string(event.command.guild_id);
@@ -56,7 +56,7 @@ void Commands::welcome_handler(const dpp::slashcommand_t &event) {
 }
 
 
-void Commands::newcomer_handler(const dpp::slashcommand_t &event) {
+void Commands::newcomerHandler(const dpp::slashcommand_t &event) {
     auto subcommand = event.command.get_command_interaction().options[0];
 
     std::string guild_id = std::to_string(event.command.guild_id);
@@ -81,7 +81,7 @@ void Commands::newcomer_handler(const dpp::slashcommand_t &event) {
 }
 
 
-void Commands::announce_handler(const dpp::slashcommand_t &event) {
+void Commands::announceHandler(const dpp::slashcommand_t &event) {
     auto subcommand = event.command.get_command_interaction().options[0];
 
     std::string guild_id = std::to_string(event.command.guild_id);

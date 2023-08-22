@@ -9,8 +9,6 @@
 
 
 namespace Listeners {
-    void bind();
-
     void onReady(const dpp::ready_t &event);
     void onButtonClick(const dpp::button_click_t &event);
     void onSelectClick(const dpp::select_click_t &event);

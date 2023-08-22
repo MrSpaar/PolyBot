@@ -10,28 +10,26 @@ typedef void (*slash_handler)(const dpp::slashcommand_t&);
 
 
 namespace Commands {
-    void bind();
-
     inline void reply(const dpp::slashcommand_t &event, const dpp::embed& embed, bool ephemeral = false) {
         dpp::message msg = dpp::message(event.command.channel_id, embed);
         msg.flags = ephemeral ? dpp::m_ephemeral : 0;
         event.reply(msg);
     }
 
-    void logs_handler(const dpp::slashcommand_t &event);
-    void welcome_handler(const dpp::slashcommand_t &event);
-    void newcomer_handler(const dpp::slashcommand_t &event);
-    void announce_handler(const dpp::slashcommand_t &event);
-    void rank_handler(const dpp::slashcommand_t &event);
-    void leaderboard_handler(const dpp::slashcommand_t &event);
-    void buttons_handler(const dpp::slashcommand_t &event);
-    void select_handler(const dpp::slashcommand_t &event);
-    void kick_handler(const dpp::slashcommand_t &event);
-    void ban_handler(const dpp::slashcommand_t &event);
-    void unban_handler(const dpp::slashcommand_t &event);
-    void clear_handler(const dpp::slashcommand_t &event);
-    void twitch_handler(const dpp::slashcommand_t &event);
-    void wiki_handler(const dpp::slashcommand_t &event);
+    void logsHandler(const dpp::slashcommand_t &event);
+    void welcomeHandler(const dpp::slashcommand_t &event);
+    void newcomerHandler(const dpp::slashcommand_t &event);
+    void announceHandler(const dpp::slashcommand_t &event);
+    void rankHandler(const dpp::slashcommand_t &event);
+    void leaderboardHandler(const dpp::slashcommand_t &event);
+    void buttonsHandler(const dpp::slashcommand_t &event);
+    void selectHandler(const dpp::slashcommand_t &event);
+    void kickHandler(const dpp::slashcommand_t &event);
+    void banHandler(const dpp::slashcommand_t &event);
+    void unbanHandler(const dpp::slashcommand_t &event);
+    void clearHandler(const dpp::slashcommand_t &event);
+    void twitchHandler(const dpp::slashcommand_t &event);
+    void wikiHandler(const dpp::slashcommand_t &event);
 }
 
 

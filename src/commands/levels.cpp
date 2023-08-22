@@ -7,7 +7,7 @@
 #include "commands.h"
 
 
-void Commands::rank_handler(const dpp::slashcommand_t &event) {
+void Commands::rankHandler(const dpp::slashcommand_t &event) {
     dpp::command_value param = event.get_parameter("membre");
     bool has_param = std::holds_alternative<dpp::snowflake>(param);
 
@@ -51,7 +51,7 @@ void Commands::rank_handler(const dpp::slashcommand_t &event) {
 }
 
 
-void Commands::leaderboard_handler(const dpp::slashcommand_t &event) {
+void Commands::leaderboardHandler(const dpp::slashcommand_t &event) {
     std::string guild_id = std::to_string(event.command.guild_id);
 
     Env::SQL << "SELECT id, level, xp, ROW_NUMBER() OVER (ORDER BY xp DESC) AS rank FROM users WHERE guild = ? LIMIT 10;",

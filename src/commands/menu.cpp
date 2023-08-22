@@ -23,7 +23,7 @@ void wait_for_roles(const dpp::slashcommand_t &event, const callback_t& callback
 }
 
 
-void Commands::buttons_handler(const dpp::slashcommand_t &event) {
+void Commands::buttonsHandler(const dpp::slashcommand_t &event) {
     std::string title = event.command.get_command_interaction().options[0].get_value<std::string>(0);
     event.reply("Envoie un message avec les rôles à ajouter au menu");
 
@@ -49,7 +49,7 @@ void Commands::buttons_handler(const dpp::slashcommand_t &event) {
 }
 
 
-void Commands::select_handler(const dpp::slashcommand_t &event) {
+void Commands::selectHandler(const dpp::slashcommand_t &event) {
     std::string title = event.command.get_command_interaction().options[0].get_value<std::string>(0);
     event.reply("Envoie un message avec les rôles à ajouter au menu");
 

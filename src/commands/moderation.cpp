@@ -5,7 +5,7 @@
 #include "commands.h"
 
 
-void Commands::kick_handler(const dpp::slashcommand_t &event) {
+void Commands::kickHandler(const dpp::slashcommand_t &event) {
     auto subcommand = event.command.get_command_interaction().options[0];
 
     std::string reason = "Pas de raison spécifiée";
@@ -29,7 +29,7 @@ void Commands::kick_handler(const dpp::slashcommand_t &event) {
 }
 
 
-void Commands::ban_handler(const dpp::slashcommand_t &event) {
+void Commands::banHandler(const dpp::slashcommand_t &event) {
     auto subcommand = event.command.get_command_interaction().options[0];
 
     std::string reason = "Pas de raison spécifiée";
@@ -53,7 +53,7 @@ void Commands::ban_handler(const dpp::slashcommand_t &event) {
 }
 
 
-void Commands::unban_handler(const dpp::slashcommand_t &event) {
+void Commands::unbanHandler(const dpp::slashcommand_t &event) {
     auto subcommand = event.command.get_command_interaction().options[0];
 
     std::string reason = "Pas de raison spécifiée";
@@ -77,7 +77,7 @@ void Commands::unban_handler(const dpp::slashcommand_t &event) {
 }
 
 
-void Commands::clear_handler(const dpp::slashcommand_t &event) {
+void Commands::clearHandler(const dpp::slashcommand_t &event) {
     int64_t count = std::get<int64_t>(event.get_parameter("nombre"));
 
     if (count < 2 || count > 100)
