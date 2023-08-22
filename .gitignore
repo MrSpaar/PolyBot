@@ -1,4 +1,7 @@
 /cmake-build-run/
+/cmake-build-debug/
+/cmake-build-release/
+
 /.idea/
 /libs/
 /data/

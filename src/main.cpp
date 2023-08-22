@@ -93,6 +93,7 @@ int main() {
     Listeners::bind();
     Commands::bind();
 
+    Env::BOT.intents = dpp::i_default_intents | dpp::i_guild_members;
     Env::BOT.start(dpp::st_wait);
     return 0;
 }

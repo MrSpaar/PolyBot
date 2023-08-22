@@ -14,8 +14,7 @@
 
 
 namespace sqlite {
-    struct run_t{};
-    static inline run_t run{};
+    static struct run_t{} run;
 }
 
 
@@ -98,7 +97,7 @@ public:
     }
 
     template<typename T>
-    SQLite &operator,(const T &value) {
+    SQLite& operator,(const T &value) {
         size_t pos = query.find('?');
         query.erase(pos, 1);
 
