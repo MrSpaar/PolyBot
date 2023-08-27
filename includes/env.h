@@ -46,6 +46,22 @@ public:
     static void init(const std::string &token, const std::string &dbPath) {
         BOT.token = token;
         SQL.init(dbPath);
+
+        SQL << "CREATE TABLE IF NOT EXISTS guilds ("
+                    "    id STRING PRIMARY KEY NOT NULL,"
+                    "    announce_channel TEST,"
+                    "    logs_channel TEXT,"
+                    "    newcomer_role TEXT,"
+                    "    welcome_channel TEXT,"
+                    "    welcome_message TEXT"
+                    ");";
+
+        SQL << "CREATE TABLE IF NOT EXISTS users ("
+                    "    id STRING PRIMARY KEY NOT NULL,"
+                    "    guild STRING PRIMARY KEY NOT NULL,"
+                    "    xp INTEGER NOT NULL DEFAULT 0,"
+                    "    level INTEGER NOT NULL DEFAULT 0"
+                    ");", sqlite::run;
     }
 
     static inline std::string& get(const std::string &key) {
