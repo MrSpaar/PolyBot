@@ -52,14 +52,6 @@ public:
 
         return *this;
     }
-
-    Command& add_option(const dpp::command_option_type& type, const std::string& name, const std::string& description, bool required = true) {
-        Env::TO_BUILD.back().add_option(
-                dpp::command_option(type, name, description, required)
-        );
-
-        return *this;
-    }
 private:
     static std::function<void(const dpp::slashcommand_t&)> wrap(const std::string& name, slash_handler handler) {
         return [name, handler](const dpp::slashcommand_t &event) {
