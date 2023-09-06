@@ -9,9 +9,6 @@ void Listeners::onReady(const dpp::ready_t &event) {
     if (!dpp::run_once<struct register_commands>())
         return;
 
-    Env::BOT.set_presence(dpp::presence(dpp::ps_online, dpp::at_game, "vous observer"));
-    std::cout << "Logged in as " << event.from->creator->me.username << std::endl;
-
     std::ifstream in(Env::get("JSON_PATH"));
     if (in.is_open() && nlohmann::json::parse(in) == Env::TO_BUILD) {
         std::cout << "Commands already registered" << std::endl;
@@ -33,4 +30,7 @@ void Listeners::onReady(const dpp::ready_t &event) {
         Env::TO_BUILD.clear();
         std::cout << "Commands registered" << std::endl;
     });
+
+    Env::BOT.set_presence(dpp::presence(dpp::ps_online, dpp::at_game, "vous observer"));
+    std::cout << "Logged in as " << event.from->creator->me.username << std::endl;
 }
