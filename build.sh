@@ -11,5 +11,5 @@ curl -s "https://api.github.com/repos/brainboxdotcc/DPP/releases/latest" \
             && dpkg -i DPP.deb \
             && rm DPP.deb
 
-[[ ! -d "build" ]] && mkdir build
-cd build && cmake .. && make -j$(nproc) && cd ..
+mkdir -p build && cd build
+cmake .. && make -j$(nproc) && cd ..
