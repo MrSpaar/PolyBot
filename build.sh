@@ -12,4 +12,4 @@ curl -s "https://api.github.com/repos/brainboxdotcc/DPP/releases/latest" \
             && rm DPP.deb
 
 mkdir -p build && cd build
-cmake .. && make -j$(nproc) && cd ..
+cmake -DCMAKE_BUILD_TYPE=Release .. && make -j$(nproc)
