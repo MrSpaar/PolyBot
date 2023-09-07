@@ -18,7 +18,7 @@ void Listeners::onGuildMemberAdd(const dpp::guild_member_add_t &event) {
             .set_color(colors::GREEN)
             .set_description(":inbox_tray: " + event.added.get_mention() + " a rejoint le serveur")));
 
-    if (event.added.get_user()->is_bot())
+    if (event.added.get_user() == nullptr || event.added.get_user()->is_bot())
         return;
 
     auto role_id = Env::SQL.get<std::string>("newcomer_role");
