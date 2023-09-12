@@ -9,47 +9,26 @@ std::map<dpp::snowflake, dpp::snowflake> channel_cache;
 std::map<dpp::snowflake, std::pair<dpp::snowflake, dpp::snowflake>> user_cache;
 
 
-auto move_callback(const dpp::guild_member &member, const dpp::channel &voice_channel, const dpp::channel &text_channel) {
-    return [member, voice_channel, text_channel](const dpp::confirmation_callback_t &callback) {
+auto move_callback(const dpp::guild_member &member, const dpp::channel &voice_channel,
+                   const std::string &name, const dpp::snowflake &category_id)
+{
+    return [member, voice_channel, name, category_id](const dpp::confirmation_callback_t &callback) {
         if (callback.is_error()) {
             Env::BOT.channel_delete(voice_channel.id);
-            Env::BOT.channel_delete(text_channel.id);
             return;
         }
 
-        channel_cache[voice_channel.id] = text_channel.id;
         user_cache[member.user_id] = {voice_channel.id, voice_channel.id};
-    };
-}
-
-auto text_callback(const dpp::guild_member &member, const dpp::channel &voice_channel) {
-    return [member, voice_channel](const dpp::confirmation_callback_t &callback) {
-        if (callback.is_error()) {
-            Env::BOT.channel_delete(voice_channel.id);
-            return;
-        }
-
-        auto text_channel = std::get<dpp::channel>(callback.value);
-        Env::BOT.guild_member_move(
-                voice_channel.id, member.guild_id, member.user_id,
-                move_callback(member, voice_channel, text_channel)
-        );
-    };
-}
-
-auto voice_callback(const dpp::guild_member &member, const std::string &name, const dpp::snowflake &category_id) {
-    return [member, name, category_id](const dpp::confirmation_callback_t &callback) {
-        if (callback.is_error())
-            return;
-
-        auto voice_channel = std::get<dpp::channel>(callback.value);
-        auto cb = text_callback(member, voice_channel);
-
         Env::BOT.channel_create(dpp::channel()
-                 .set_name(name)
-                 .set_parent_id(category_id)
-                 .set_guild_id(member.guild_id)
-                 .set_type(dpp::channel_type::CHANNEL_TEXT), cb
+                .set_name(name)
+                .set_parent_id(category_id)
+                .set_guild_id(member.guild_id)
+                .set_type(dpp::channel_type::CHANNEL_TEXT),
+
+                [member, voice_channel](const dpp::confirmation_callback_t &callback) {
+                    auto text_channel = std::get<dpp::channel>(callback.value);
+                    channel_cache[voice_channel.id] = text_channel.id;
+                }
         );
     };
 }
@@ -71,7 +50,18 @@ void channel_joined_handler(const dpp::guild_member &member, const dpp::snowflak
             .set_name(name)
             .set_parent_id(category_id)
             .set_guild_id(member.guild_id)
-            .set_type(dpp::channel_type::CHANNEL_VOICE), voice_callback(member, name, category_id)
+            .set_type(dpp::channel_type::CHANNEL_VOICE),
+
+            [member, name, category_id](const dpp::confirmation_callback_t &callback) {
+                if (callback.is_error())
+                    return;
+
+                auto voice_channel = std::get<dpp::channel>(callback.value);
+                Env::BOT.guild_member_move(
+                        voice_channel.id, member.guild_id, member.user_id,
+                        move_callback(member, voice_channel, name, category_id)
+                );
+            }
     );
 }
 
