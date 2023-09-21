@@ -94,7 +94,7 @@ void Listeners::onVoiceStateUpdate(const dpp::voice_state_update_t &event) {
     bool is_temp_channel = joined->name.rfind(Env::get("TEMP_CHANNEL_PREFIX"), 0) == 0;
 
     if (!is_temp_channel && !is_gen_channel)
-        return;
+        return channel_left_handler(event);
 
     if (is_temp_channel && !is_user_cached) {
         user_cache[event.state.user_id] = {joined->id, 0};
@@ -107,7 +107,7 @@ void Listeners::onVoiceStateUpdate(const dpp::voice_state_update_t &event) {
     }
 
     if (!is_gen_channel)
-        return;
+        return channel_left_handler(event);
 
     if (is_user_cached && !user_cache[event.state.user_id].second.empty())
         return Env::BOT.guild_member_move(
