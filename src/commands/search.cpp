@@ -3,9 +3,8 @@
 //
 
 #include <ranges>
-
+#include "bot.h"
 #include "request.h"
-#include "commands.h"
 
 
 struct {
@@ -14,19 +13,19 @@ struct {
 } twitch_oauth;
 
 
-dpp::embed fetch_streams(const std::string &category, const std::string &limit, std::vector<std::string> &filters) {
+dpp::embed fetch_streams(const std::string &clientID, const std::string &category, const std::string &limit, std::vector<std::string> &filters) {
     json j = Request("https://api.twitch.tv/helix/search/channels?live_only=true&query=" + category + "&first=" + limit)
-            .add_header("Client-ID", Env::get("TWITCH_CLIENT"))
+            .add_header("Client-ID", clientID)
             .add_header("Authorization", "Bearer " + twitch_oauth.token)
             .get();
 
     if (j.contains("error"))
         return dpp::embed()
                 .set_description("❌ Aucun résultat")
-                .set_color(colors::RED);
+                .set_color(RED);
 
     dpp::embed emb = dpp::embed()
-            .set_color(colors::BLUE)
+            .set_color(BLUE)
             .set_author("Twitch - " + (std::string) j["data"][0]["game_name"], "", "https://i.imgur.com/gArdgyC.png");
 
     for (auto &stream: j["data"] | std::ranges::views::filter([&filters](auto &stream) {
@@ -49,7 +48,7 @@ dpp::embed fetch_streams(const std::string &category, const std::string &limit, 
 }
 
 
-void Commands::twitchHandler(const dpp::slashcommand_t &event) {
+void Bot::twitchHandler(const dpp::slashcommand_t &event) {
     auto subcommand = event.command.get_command_interaction().options[0];
     std::string category = subcommand.get_value<std::string>(0);
 
@@ -63,29 +62,29 @@ void Commands::twitchHandler(const dpp::slashcommand_t &event) {
     }
 
     if (!twitch_oauth.token.empty() && twitch_oauth.expires > time(nullptr))
-        return Commands::reply(event, fetch_streams(category, limit, filters));
+        return Bot::reply(event, fetch_streams(env["TWITCH_CLIENT"], category, limit, filters));
 
-    std::string data = "client_id=" + Env::get("TWITCH_CLIENT") +
-                       "&client_secret=" + Env::get("TWITCH_TOKEN") +
+    std::string data = "client_id=" + env["TWITCH_CLIENT"] +
+                       "&client_secret=" + env["TWITCH_TOKEN"] +
                        "&grant_type=client_credentials";
 
     json j = Request("https://id.twitch.tv/oauth2/token")
             .post(data);
 
     if (j.contains("error"))
-        return Commands::reply(event, dpp::embed()
+        return Bot::reply(event, dpp::embed()
                 .set_description("❌ Une erreur est survenue")
-                .set_color(colors::RED), true
+                .set_color(RED), true
         );
 
     twitch_oauth.token = j["access_token"];
     twitch_oauth.expires = time(nullptr) + (time_t) j["expires_in"];
 
-    Commands::reply(event, fetch_streams(category, limit, filters));
+    Bot::reply(event, fetch_streams(env["TWITCH_CLIENT"], category, limit, filters));
 }
 
 
-void Commands::wikiHandler(const dpp::slashcommand_t &event) {
+void Bot::wikiHandler(const dpp::slashcommand_t &event) {
     auto subcommand = event.command.get_command_interaction().options[0];
     std::string title = subcommand.get_value<std::string>(0);
 
@@ -95,16 +94,16 @@ void Commands::wikiHandler(const dpp::slashcommand_t &event) {
     ).get();
 
     if (j.empty() || j["query"]["pages"].contains("-1"))
-        return Commands::reply(event, dpp::embed()
+        return Bot::reply(event, dpp::embed()
                 .set_description("❌ Aucun résultat")
-                .set_color(colors::RED), true
+                .set_color(RED), true
         );
 
     json article = j["query"]["pages"].begin().value();
     std::string full_url = "https://fr.wikipedia.org/wiki/" + article["title"].dump();
 
-    Commands::reply(event, dpp::embed()
-            .set_color(colors::BLUE)
+    Bot::reply(event, dpp::embed()
+            .set_color(BLUE)
             .set_author("Wikipedia - " + (std::string) article["title"], "", "https://i.imgur.com/nDTQgbf.png")
             .set_description((std::string) article["extract"] + " [En savoir plus](" + full_url + ")")
     );
