@@ -57,7 +57,7 @@ SQLQuery& SQLQuery::bind(const T &value) {
     else if constexpr (std::is_convertible_v<T, std::string>)
         sqlite3_bind_text(stmt, index++, value.data(), (int) value.size(), SQLITE_TRANSIENT);
     else
-        static_assert(false, "Unsupported type");
+        static_assert(std::false_type::value, "Unsupported type");
 
     return *this;
 }
@@ -71,7 +71,7 @@ T SQLRow::get(const char *key) {
     else if constexpr (std::is_convertible_v<T, std::string>)
         return data[key];
     else
-        static_assert(false, "Unsupported type");
+        static_assert(std::false_type::value, "Unsupported type");
 }
 
 
