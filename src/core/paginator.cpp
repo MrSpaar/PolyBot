@@ -69,8 +69,6 @@ void Paginator::fill(dpp::embed &embed, const std::string &guild_id, int offset)
         progress += to_progress_bar(level, row.get<int>("xp"), 6) + "\n";
     }
 
-    std::cout << "Finished" << std::endl;
-
     embed.add_field("Nom", names.empty() ? "Aucun" : names, true)
             .add_field("Niveau", levels.empty() ? "Aucun" : names, true)
             .add_field("Progression", progress.empty() ? "Aucun" : progress, true);
