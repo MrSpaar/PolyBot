@@ -13,24 +13,18 @@ TWITCH_TOKEN="..."
 TWITCH_CLIENT="..."
 ```
 
-Une fois configuré, il suffit de déployer le bot avec `docker-compose up -d`.
+Une fois configuré, il suffit de d'exécuter `build.sh` et un exécutable `PolyBot` sera généré dans `cmake-build-release`.
 
 # Commandes
 
 ### • 🧍 Commandes utilisateur
 
-| Categorie                               | Commandes         |
-|-----------------------------------------|-------------------|
-| [Niveaux](src/commands/levels.cpp)      | `perso` `global`  |
-| [Recherche](src/commands/search.cpp)    | `twitch` `wiki`   |
-
-### • 🔒 Commandes admin
-
-| Categorie                                 | Commandes                              |
-|-------------------------------------------|----------------------------------------|
-| [Modération](src/commands/moderation.cpp) | `clear` `unban`                        |
-| [Configuration](src/commands/config.cpp)  | `logs` `bienvenue` `nouveau` `annonce` |
-
+| Categorie                                 | Commandes                               |
+|-------------------------------------------|-----------------------------------------|
+| [Niveaux](src/commands/levels.cpp)        | `perso` `global`                        |
+| [Recherche](src/commands/search.cpp)      | `twitch` `wiki`                         |
+| [Modération](src/commands/moderation.cpp) | `clear` `unban`                         |
+| [Configuration](src/commands/config.cpp)  | `logs` `bienvenue` `nouveau` `annonce`  |
 
 # Modules supplémentaires
 
