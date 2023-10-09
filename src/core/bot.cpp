@@ -4,6 +4,8 @@
 
 #include "bot.h"
 
+#include <utility>
+
 
 Bot::Bot(const char *envPath, uint32_t intents,
         const std::string &token, uint32_t shards, uint32_t clusterId, uint32_t maxclusters,
@@ -42,8 +44,14 @@ Bot::Bot(const char *envPath, uint32_t intents,
 }
 
 
-Bot& Bot::command(const std::string &name, const std::string &description, const slash_callback_t& handler) {
+Bot& Bot::command(
+        const std::string &name, const std::string &description,
+        const dpp::permission &permissions, const slash_callback_t& handler
+) {
     toBuild.emplace_back(name, description, 0);
+
+    if (permissions > 0)
+        toBuild.back().set_default_permissions(permissions);
 
     if (handler != nullptr)
         callbacks[name] = handler;
@@ -54,14 +62,14 @@ Bot& Bot::command(const std::string &name, const std::string &description, const
 
 Bot& Bot::subcommand(
         const std::string &name, const std::string &description,
-        const slash_callback_t &handler, std::vector<dpp::command_option> options
+        const slash_callback_t &handler, std::vector<dpp::command_option>&& options
 ) {
-    dpp::command_option subcommand(dpp::co_sub_command, name, description);
-
-    subcommand.options = options;
-    toBuild.back().add_option(subcommand);
-
+    auto &command = toBuild.back();
     callbacks[name] = handler;
+
+    command.add_option({dpp::co_sub_command, name, description});
+    command.options.back().options = std::move(options);
+
     return *this;
 }
 

@@ -12,7 +12,7 @@ int main() {
     bot.on_guild_ban_remove(WRAP(dpp::guild_ban_remove_t, unbanHandler));
     bot.on_voice_state_update(WRAP(dpp::voice_state_update_t, voiceHandler));
 
-    bot.command("config", "Base des commandes de configuration")
+    bot.command("config", "Base des commandes de configuration", dpp::p_manage_guild)
             .subcommand("logs", "Définir le salon des logs", WRAP(logsHandler), {
                     {dpp::co_channel, "salon", "Le salon où envoyer les logs"}
             })
@@ -39,7 +39,7 @@ int main() {
             .subcommand("wiki", "Rechercher un article Wikipedia", WRAP(wikiHandler), {
                     {dpp::co_string, "titre", "Le nom de l'article à rechercher", true}
             })
-       .command("mod", "Base des commandes de modération")
+       .command("mod", "Base des commandes de modération", dpp::p_ban_members)
             .subcommand("unban", "Débannir un membre du serveur", WRAP(unbanHandler), {
                     {dpp::co_user, "membre", "Le membre à débannir", true},
                     {dpp::co_string, "raison", "La raison du débannissement"}

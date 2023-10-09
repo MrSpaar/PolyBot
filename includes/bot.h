@@ -34,10 +34,13 @@ public:
     std::string getEnv(const std::string &key) const { return env.at(key); }
     Database& getDB() { return db; }
 
-    Bot& command(const std::string &name, const std::string &description, const slash_callback_t& handler = nullptr);
+    Bot& command(
+            const std::string &name, const std::string &description,
+            const dpp::permission &permissions = 0, const slash_callback_t& handler = nullptr
+    );
     Bot& subcommand(
             const std::string &name, const std::string &description,
-            const slash_callback_t& handler, std::vector<dpp::command_option> options = {}
+            const slash_callback_t& handler, std::vector<dpp::command_option>&& options = {}
     );
 
     void logsHandler(const dpp::slashcommand_t &event);
