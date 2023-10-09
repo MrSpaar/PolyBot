@@ -46,6 +46,9 @@ private:
 };
 
 
+template<typename>
+struct always_false : std::false_type {};
+
 template<typename T>
 SQLQuery& SQLQuery::bind(const T &value) {
     if constexpr (std::is_convertible_v<T, float>)
@@ -57,7 +60,7 @@ SQLQuery& SQLQuery::bind(const T &value) {
     else if constexpr (std::is_convertible_v<T, std::string>)
         sqlite3_bind_text(stmt, index++, value.data(), (int) value.size(), SQLITE_TRANSIENT);
     else
-        static_assert(std::false_type::value, "Unsupported type");
+        static_assert(always_false<T>::value, "Unsupported type");
 
     return *this;
 }
@@ -71,7 +74,7 @@ T SQLRow::get(const char *key) {
     else if constexpr (std::is_convertible_v<T, std::string>)
         return data[key];
     else
-        static_assert(std::false_type::value, "Unsupported type");
+        static_assert(always_false<T>::value, "Unsupported type");
 }
 
 
