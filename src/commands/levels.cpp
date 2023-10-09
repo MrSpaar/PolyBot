@@ -2,7 +2,6 @@
 // Created by mrspaar on 3/18/23.
 //
 
-#include "bot.h"
 #include "paginator.h"
 
 
@@ -16,7 +15,7 @@ void Bot::rankHandler(const dpp::slashcommand_t &event) {
     SQLRow row;
     std::string guild_id = std::to_string(event.command.guild_id);
 
-    int rc = db.prepare(
+    int rc = SQLQuery(db,
             "SELECT level, xp, rank FROM ("
             "   SELECT level, xp, id, ROW_NUMBER() OVER (ORDER BY xp DESC) AS rank FROM users WHERE guild = ?"
             ") WHERE id = ?;"
@@ -56,24 +55,18 @@ void Bot::rankHandler(const dpp::slashcommand_t &event) {
 
 
 void Bot::leaderboardHandler(const dpp::slashcommand_t &event) {
-    std::string guild_id = std::to_string(event.command.guild_id);
-
     dpp::embed embed = dpp::embed()
             .set_color(BLUE)
             .set_footer("Page 1", "")
             .set_author("Classement du serveur", "", event.command.get_guild().get_icon_url());
 
-    SQLQuery query = db.prepare(
-            "SELECT id, level, xp, ROW_NUMBER() OVER (ORDER BY xp DESC) AS rank FROM users WHERE guild = ? LIMIT 10;"
-    ).bind(guild_id);
-
-    Paginator::processRows(query, embed);
     Bot::reply(event, embed);
 
     event.get_original_response([&](const dpp::confirmation_callback_t &callback) {
         if (callback.is_error())
             return;
 
-        Paginator::create(this, get<dpp::message>(callback.value));
+        dpp::message msg = get<dpp::message>(callback.value);
+        Paginator::CACHE[msg.id] = new Paginator(this, msg);
     });
 }

@@ -9,12 +9,12 @@ void Bot::logsHandler(const dpp::slashcommand_t &event) {
     auto subcommand = event.command.get_command_interaction().options[0];
     std::string guild_id = std::to_string(event.command.guild_id);
 
-    prepare("INSERT OR IGNORE INTO guilds (id) VALUES (?);")
+    SQLQuery(db, "INSERT OR IGNORE INTO guilds (id) VALUES (?);")
             .bind(guild_id)
             .step();
 
     if (subcommand.options.empty()) {
-        prepare("UPDATE guilds SET logs_channel = 0 WHERE id = ?;")
+        SQLQuery(db, "UPDATE guilds SET logs_channel = 0 WHERE id = ?;")
                 .bind(guild_id)
                 .step();
 
@@ -26,7 +26,7 @@ void Bot::logsHandler(const dpp::slashcommand_t &event) {
 
     std::string channel_id = std::to_string(subcommand.get_value<dpp::snowflake>(0));
 
-    db.prepare("UPDATE guilds SET logs_channel = ? WHERE id = ?")
+    SQLQuery(db, "UPDATE guilds SET logs_channel = ? WHERE id = ?")
             .bind(channel_id)
             .bind(guild_id)
             .step();
@@ -42,12 +42,12 @@ void Bot::welcomeHandler(const dpp::slashcommand_t &event) {
     auto subcommand = event.command.get_command_interaction().options[0];
     std::string guild_id = std::to_string(event.command.guild_id);
 
-    db.prepare("INSERT OR IGNORE INTO guilds (id) VALUES (?);")
+    SQLQuery(db, "INSERT OR IGNORE INTO guilds (id) VALUES (?);")
             .bind(guild_id)
             .step();
 
     if (subcommand.options.empty()) {
-        db.prepare("UPDATE guilds SET welcome_channel = 0, welcome_message = '' WHERE id = ?")
+        SQLQuery(db, "UPDATE guilds SET welcome_channel = 0, welcome_message = '' WHERE id = ?")
                 .bind(guild_id)
                 .step();
 
@@ -59,7 +59,7 @@ void Bot::welcomeHandler(const dpp::slashcommand_t &event) {
 
     std::string channel_id = std::to_string(subcommand.get_value<dpp::snowflake>(0));
 
-    db.prepare("UPDATE guilds SET welcome_channel = ?, welcome_message = ? WHERE id = ?")
+    SQLQuery(db, "UPDATE guilds SET welcome_channel = ?, welcome_message = ? WHERE id = ?")
             .bind(channel_id)
             .bind(subcommand.get_value<std::string>(1))
             .bind(guild_id)
@@ -76,12 +76,12 @@ void Bot::newcomerHandler(const dpp::slashcommand_t &event) {
     auto subcommand = event.command.get_command_interaction().options[0];
     std::string guild_id = std::to_string(event.command.guild_id);
 
-    db.prepare("INSERT OR IGNORE INTO guilds (id) VALUES (?);")
+    SQLQuery(db, "INSERT OR IGNORE INTO guilds (id) VALUES (?);")
             .bind(guild_id)
             .step();
 
     if (subcommand.options.empty()) {
-        db.prepare("UPDATE guilds SET newcomer_role = 0 WHERE id = ?")
+        SQLQuery(db, "UPDATE guilds SET newcomer_role = 0 WHERE id = ?")
                 .bind(guild_id)
                 .step();
 
@@ -93,7 +93,7 @@ void Bot::newcomerHandler(const dpp::slashcommand_t &event) {
 
     std::string role_id = std::to_string(subcommand.get_value<dpp::snowflake>(0));
 
-    db.prepare("UPDATE guilds SET newcomer_role = ? WHERE id = ?")
+    SQLQuery(db, "UPDATE guilds SET newcomer_role = ? WHERE id = ?")
             .bind(role_id)
             .bind(guild_id)
             .step();
@@ -109,12 +109,12 @@ void Bot::announceHandler(const dpp::slashcommand_t &event) {
     auto subcommand = event.command.get_command_interaction().options[0];
     std::string guild_id = std::to_string(event.command.guild_id);
 
-    db.prepare("INSERT OR IGNORE INTO guilds (id) VALUES (?);")
+    SQLQuery(db, "INSERT OR IGNORE INTO guilds (id) VALUES (?);")
             .bind(guild_id)
             .step();
 
     if (subcommand.options.empty()) {
-        db.prepare("UPDATE guilds SET announce_channel = 0 WHERE id = ?")
+        SQLQuery(db, "UPDATE guilds SET announce_channel = 0 WHERE id = ?")
                 .bind(guild_id)
                 .step();
 
@@ -126,7 +126,7 @@ void Bot::announceHandler(const dpp::slashcommand_t &event) {
 
     std::string channel_id = std::to_string(subcommand.get_value<dpp::snowflake>(0));
 
-    db.prepare("UPDATE guilds SET announce_channel = ? WHERE id = ?")
+    SQLQuery(db, "UPDATE guilds SET announce_channel = ? WHERE id = ?")
             .bind(channel_id)
             .bind(guild_id)
             .step();

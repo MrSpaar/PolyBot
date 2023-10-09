@@ -32,7 +32,7 @@ public:
     );
 
     std::string getEnv(const std::string &key) const { return env.at(key); }
-    SQLQuery prepare(const std::string_view &query) { return db.prepare(query); }
+    Database& getDB() { return db; }
 
     Bot& command(const std::string &name, const std::string &description, const slash_callback_t& handler = nullptr);
     Bot& subcommand(

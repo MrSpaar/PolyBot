@@ -9,7 +9,7 @@ void Bot::memberJoinHandler(const dpp::guild_member_add_t &event) {
     SQLRow row;
     std::string guild_id = std::to_string(event.added.guild_id);
 
-    int rc = db.prepare("SELECT welcome_channel, welcome_message, logs_channel, newcomer_role FROM guilds WHERE id = ?")
+    int rc = SQLQuery(db, "SELECT welcome_channel, welcome_message, logs_channel, newcomer_role FROM guilds WHERE id = ?")
             .bind(guild_id)
             .step(row);
 
@@ -38,7 +38,7 @@ void Bot::memberJoinHandler(const dpp::guild_member_add_t &event) {
         message_create(dpp::message(welcome_channel_id, welcome_message));
     }
 
-    db.prepare("INSERT OR IGNORE INTO users(id, guild) VALUES(?, ?);")
+    SQLQuery(db, "INSERT OR IGNORE INTO users(id, guild) VALUES(?, ?);")
             .bind(std::to_string(event.added.user_id))
             .bind(guild_id)
             .step();
@@ -48,7 +48,7 @@ void Bot::memberJoinHandler(const dpp::guild_member_add_t &event) {
 void Bot::memberLeaveHandler(const dpp::guild_member_remove_t &event) {
     SQLRow row;
 
-    int rc = db.prepare("SELECT logs_channel FROM guilds WHERE id = ?")
+    int rc = SQLQuery(db, "SELECT logs_channel FROM guilds WHERE id = ?")
             .bind(std::to_string(event.removing_guild->id))
             .step(row);
 
@@ -72,12 +72,12 @@ void Bot::banHandler(const dpp::guild_ban_add_t &event) {
     SQLRow row;
     std::string guild_id = std::to_string(event.banning_guild->id);
 
-    db.prepare("DELETE FROM users WHERE id = ? AND guild = ?;")
-      .bind(std::to_string(event.banned.id))
-      .bind(guild_id)
-      .step();
+    SQLQuery(db, "DELETE FROM users WHERE id = ? AND guild = ?;")
+            .bind(std::to_string(event.banned.id))
+            .bind(guild_id)
+            .step();
 
-    int rc = db.prepare("SELECT logs_channel FROM guilds WHERE id = ?")
+    int rc = SQLQuery(db, "SELECT logs_channel FROM guilds WHERE id = ?")
             .bind(std::to_string(event.banning_guild->id))
             .step(row);
 
@@ -97,7 +97,7 @@ void Bot::banHandler(const dpp::guild_ban_add_t &event) {
 void Bot::unbanHandler(const dpp::guild_ban_remove_t &event) {
     SQLRow row;
 
-    int rc = db.prepare("SELECT logs_channel FROM guilds WHERE id = ?")
+    int rc = SQLQuery(db, "SELECT logs_channel FROM guilds WHERE id = ?")
             .bind(std::to_string(event.unbanning_guild->id))
             .step(row);
 

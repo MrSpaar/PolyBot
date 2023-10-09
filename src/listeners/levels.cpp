@@ -3,7 +3,6 @@
 //
 
 #include <random>
-#include "bot.h"
 #include "paginator.h"
 
 
@@ -27,7 +26,7 @@ void Bot::messageHandler(const dpp::message_create_t &event) {
     std::string guild_id = std::to_string(event.msg.guild_id);
     std::string user_id = std::to_string(event.msg.author.id);
 
-    int rc = prepare("SELECT level, xp FROM users WHERE id = ? AND guild = ?")
+    int rc = SQLQuery(db, "SELECT level, xp FROM users WHERE id = ? AND guild = ?")
            .bind(user_id)
            .bind(guild_id)
            .step(row);
@@ -44,7 +43,7 @@ void Bot::messageHandler(const dpp::message_create_t &event) {
     if (xp >= next_cap) {
         level++;
 
-        rc = prepare("SELECT announce_channel FROM guilds WHERE id = ?")
+        rc = SQLQuery(db, "SELECT announce_channel FROM guilds WHERE id = ?")
                .bind(guild_id)
                .step(row);
 
@@ -60,7 +59,7 @@ void Bot::messageHandler(const dpp::message_create_t &event) {
         ));
     }
 
-    db.prepare("UPDATE users SET level = ?, xp = ? WHERE id = ? AND guild = ?")
+    SQLQuery(db, "UPDATE users SET level = ?, xp = ? WHERE id = ? AND guild = ?")
           .bind(level)
           .bind(xp)
           .bind(user_id)
@@ -81,16 +80,10 @@ void Bot::reactionHandler(const dpp::message_reaction_add_t &event) {
     std::string guild_id = std::to_string(event.reacting_guild->id);
     int next_page = page->increment(guild_id, event.reacting_emoji.name);
 
-    SQLQuery query = db.prepare(
-            "SELECT id, level, xp, ROW_NUMBER() OVER (ORDER BY xp DESC) as rank "
-            "FROM users WHERE guild = ? LIMIT 10 OFFSET ?"
-    ).bind(guild_id)
-     .bind(next_page*10);
-
     dpp::embed embed = dpp::embed()
             .set_color(BLUE)
             .set_footer("Page " + std::to_string(next_page+1), "");
 
-    Paginator::processRows(query, embed);
+    page->fill(embed, guild_id, next_page*10);
     page->update(embed, event.reacting_user.id, event.reacting_emoji);
 }

@@ -5,7 +5,6 @@
 #ifndef POLYBOT_REQUEST_H
 #define POLYBOT_REQUEST_H
 
-#include <list>
 #include <sstream>
 #include <curl/curl.h>
 #include <dpp/nlohmann/json.hpp>

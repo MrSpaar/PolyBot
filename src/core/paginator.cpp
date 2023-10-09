@@ -5,15 +5,14 @@
 #include "paginator.h"
 
 
-void Paginator::create(Bot *bot, const dpp::message &message) {
-    CACHE[message.id] = new Paginator(bot, message);
-}
-
-Paginator::Paginator(Bot *bot, const dpp::message &message, int pageNum) {
+Paginator::Paginator(Bot *bot, dpp::message &message, int pageNum) {
     this->bot = bot;
     this->pageNum = pageNum;
     this->message = message;
 
+    fill(message.embeds[0], std::to_string(message.guild_id));
+
+    bot->message_edit(message);
     bot->message_add_reaction(message, "⬅️");
     bot->message_add_reaction(message, "➡️");
 }
@@ -35,7 +34,7 @@ void Paginator::update(const dpp::embed &embed, const dpp::snowflake &user, cons
 int Paginator::increment(const std::string &guild_id, const std::string &emoji) {
     SQLRow row;
 
-    int rc = bot->prepare("SELECT COUNT(*) AS count FROM users WHERE guild = ?")
+    int rc = SQLQuery(bot->getDB(), "SELECT COUNT(*) AS count FROM users WHERE guild = ?")
             .bind(guild_id)
             .step(row);
 
@@ -51,9 +50,16 @@ int Paginator::increment(const std::string &guild_id, const std::string &emoji) 
     return pageNum;
 }
 
-void Paginator::processRows(SQLQuery &query, dpp::embed &embed) {
+void Paginator::fill(dpp::embed &embed, const std::string &guild_id, int offset) {
     SQLRow row;
     std::string names, levels, progress;
+
+    auto query = SQLQuery(bot->getDB(),
+                    "SELECT id, level, xp, ROW_NUMBER() OVER (ORDER BY xp DESC) as rank "
+                    "FROM users WHERE guild = ? LIMIT 10 OFFSET ?"
+    );
+
+    query.bind(guild_id).bind(offset);
 
     while (query.step(row) == SQLITE_ROW) {
         auto level = row.get<int>("level");
@@ -63,15 +69,11 @@ void Paginator::processRows(SQLQuery &query, dpp::embed &embed) {
         progress += to_progress_bar(level, row.get<int>("xp"), 6) + "\n";
     }
 
-    if (names.empty()) {
-        names = "Aucun";
-        levels = "Aucun";
-        progress = "Aucun";
-    }
+    std::cout << "Finished" << std::endl;
 
-    embed.add_field("Nom", names, true)
-            .add_field("Niveau", levels, true)
-            .add_field("Progression", progress, true);
+    embed.add_field("Nom", names.empty() ? "Aucun" : names, true)
+            .add_field("Niveau", levels.empty() ? "Aucun" : names, true)
+            .add_field("Progression", progress.empty() ? "Aucun" : progress, true);
 }
 
 std::string Paginator::to_progress_bar(int level, int xp, int length) {
