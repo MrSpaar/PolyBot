@@ -3,6 +3,7 @@
 //
 
 #include "bot.h"
+#include "logger.h"
 
 
 void Bot::unbanHandler(const dpp::slashcommand_t &event) {
@@ -15,16 +16,21 @@ void Bot::unbanHandler(const dpp::slashcommand_t &event) {
         reason = subcommand.get_value<std::string>(1);
 
     guild_ban_delete(event.command.guild_id, member_id, [&](const dpp::confirmation_callback_t &callback) {
-            if (callback.is_error())
-                return Bot::reply(event, dpp::embed()
-                        .set_description("❌ Impossible de débannir le membre")
-                        .set_color(RED), true
-                );
+        if (callback.is_error()) {
+            logger(WARNING) << "Failed to unban user " << member_id << " for reason: " << reason << std::endl;
 
-            Bot::reply(event, dpp::embed()
-                    .set_color(GREEN)
-                    .set_description("📜 <@" + std::to_string(member_id) + "> a été débanni\n❔ Raison : " + reason)
+            return Bot::reply(event, dpp::embed()
+                    .set_description("❌ Impossible de débannir le membre")
+                    .set_color(RED), true
             );
+        }
+
+        logger(INFO) << "Unbanned user " << member_id << " for reason: " << reason << std::endl;
+
+        Bot::reply(event, dpp::embed()
+                .set_color(GREEN)
+                .set_description("📜 <@" + std::to_string(member_id) + "> a été débanni\n❔ Raison : " + reason)
+        );
     });
 }
 
@@ -41,11 +47,14 @@ void Bot::clearHandler(const dpp::slashcommand_t &event) {
     dpp::snowflake channel_id = event.command.channel_id;
 
     messages_get(channel_id, 0, 0, 0, count, [event, channel_id, this](const dpp::confirmation_callback_t &callback) {
-        if (callback.is_error())
+        if (callback.is_error()) {
+            logger(WARNING) << "Failed to get messages to delete in channel " << channel_id << std::endl;
+
             return Bot::reply(event, dpp::embed()
                     .set_description("❌ Impossible de trouver les messages à supprimer")
                     .set_color(RED), true
             );
+        }
 
         std::vector<dpp::snowflake> to_delete{};
         dpp::message_map messages = get<dpp::message_map>(callback.value);

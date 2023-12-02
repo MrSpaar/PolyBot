@@ -2,6 +2,7 @@
 // Created by mrspaar on 3/18/23.
 //
 
+#include "logger.h"
 #include "paginator.h"
 
 
@@ -23,11 +24,14 @@ void Bot::rankHandler(const dpp::slashcommand_t &event) {
      .bind(user_id)
      .step(row);
 
-    if (rc != SQLITE_ROW)
+    if (rc != SQLITE_ROW) {
+        logger(WARNING) << "User " << user_id << " not found in guild " << guild_id << std::endl;
+
         return Bot::reply(event, dpp::embed()
                 .set_color(RED)
                 .set_description("❌ L'utilisateur n'est pas enregistré ou n'a jamais parlé"), true
         );
+    }
 
     auto xp = row.get<int>("xp");
     auto level = row.get<int>("level");
@@ -42,6 +46,8 @@ void Bot::rankHandler(const dpp::slashcommand_t &event) {
         effective_avatar = user.get_avatar_url();
     } else if (effective_avatar.empty())
         effective_avatar = member.get_user()->get_avatar_url();
+
+    logger(INFO) << "User " << user_id << " used rank command" << std::endl;
 
     Bot::reply(event, dpp::embed()
             .set_color(BLUE)
@@ -61,6 +67,7 @@ void Bot::leaderboardHandler(const dpp::slashcommand_t &event) {
             .set_author("Classement du serveur", "", event.command.get_guild().get_icon_url());
 
     Bot::reply(event, embed);
+    logger(INFO) << "User " << event.command.member.user_id << " used leaderboard command" << std::endl;
 
     event.get_original_response([&](const dpp::confirmation_callback_t &callback) {
         if (callback.is_error())

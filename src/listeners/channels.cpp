@@ -3,6 +3,7 @@
 //
 
 #include "bot.h"
+#include "logger.h"
 
 
 std::map<dpp::snowflake, dpp::snowflake> channel_cache;
@@ -15,9 +16,12 @@ auto move_callback(
 ) {
     return [&, member, category_id, name, voice_channel](const dpp::confirmation_callback_t &callback) {
         if (callback.is_error()) {
+            bot.logger(WARNING) << "Error while moving user " << member.user_id << std::endl;
             bot.channel_delete(voice_channel.id);
             return;
         }
+
+        bot.logger(INFO) << "Moved user " << member.user_id << std::endl;
 
         user_cache[member.user_id] = {voice_channel.id, voice_channel.id};
         bot.channel_create(dpp::channel()
@@ -46,6 +50,7 @@ void channel_joined_handler(Bot &bot, const dpp::guild_member &member, const dpp
     }
 
     std::string name = bot.getEnv("TEMP_CHANNEL_PREFIX") + effective_name;
+    bot.logger(INFO) << "Creating channel " << name << std::endl;
 
     bot.channel_create(dpp::channel()
             .set_name(name)
@@ -74,6 +79,8 @@ void channel_left_handler(Bot &bot, const dpp::voice_state_update_t &event) {
     dpp::channel *voice_chan = dpp::find_channel(user_cache[event.state.user_id].first);
     if (voice_chan == nullptr || !voice_chan->get_voice_members().empty())
         return;
+
+    bot.logger(INFO) << "Deleting channel " << voice_chan->id << std::endl;
 
     bot.channel_delete(voice_chan->id);
     bot.channel_delete(channel_cache[voice_chan->id]);

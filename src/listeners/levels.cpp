@@ -59,6 +59,8 @@ void Bot::messageHandler(const dpp::message_create_t &event) {
         ));
     }
 
+    logger(INFO) << "User " << user_id << " gained " << xp << " xp" << std::endl;
+
     SQLQuery(db, "UPDATE users SET level = ?, xp = ? WHERE id = ? AND guild = ?")
           .bind(level)
           .bind(xp)
@@ -75,6 +77,8 @@ void Bot::reactionHandler(const dpp::message_reaction_add_t &event) {
     Paginator *page = Paginator::get(event.message_id);
     if (page == nullptr)
         return;
+
+    logger(INFO) << "User " << event.reacting_user.id << " used paginator" << std::endl;
 
     SQLRow row;
     std::string guild_id = std::to_string(event.reacting_guild->id);

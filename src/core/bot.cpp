@@ -4,8 +4,6 @@
 
 #include "bot.h"
 
-#include <utility>
-
 
 Bot::Bot(const char *envPath, uint32_t intents,
         const std::string &token, uint32_t shards, uint32_t clusterId, uint32_t maxclusters,

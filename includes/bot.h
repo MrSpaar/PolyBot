@@ -6,6 +6,8 @@
 #define POLYBOT_BOT_H
 
 #include <dpp/dpp.h>
+
+#include "logger.h"
 #include "database.h"
 
 #define GREEN 0x2ECC71
@@ -25,6 +27,8 @@ typedef std::function<void(const std::vector<dpp::snowflake> &)> role_callback_t
 
 
 class Bot: public dpp::cluster {
+public:
+    Logger logger;
 public:
     explicit Bot(const char *envPath, uint32_t intents = dpp::i_default_intents,
             const std::string &token="", uint32_t shards=0, uint32_t clusterId=0, uint32_t maxclusters=1,
@@ -64,6 +68,7 @@ public:
     void voiceHandler(const dpp::voice_state_update_t &event);
 private:
     Database db;
+
     std::vector<dpp::slashcommand> toBuild;
     std::map<std::string, std::string> env;
     std::map<std::string, slash_callback_t> callbacks;

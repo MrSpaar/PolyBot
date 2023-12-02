@@ -49,6 +49,8 @@ dpp::embed fetch_streams(const std::string &clientID, const std::string &categor
 
 
 void Bot::twitchHandler(const dpp::slashcommand_t &event) {
+    logger(INFO) << "User " << event.command.member.user_id << " used twitch command" << std::endl;
+
     auto subcommand = event.command.get_command_interaction().options[0];
     std::string category = subcommand.get_value<std::string>(0);
 
@@ -85,6 +87,8 @@ void Bot::twitchHandler(const dpp::slashcommand_t &event) {
 
 
 void Bot::wikiHandler(const dpp::slashcommand_t &event) {
+    logger(INFO) << "User " << event.command.member.user_id << " used wiki command" << std::endl;
+    
     auto subcommand = event.command.get_command_interaction().options[0];
     std::string title = subcommand.get_value<std::string>(0);
 

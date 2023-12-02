@@ -18,6 +18,8 @@ void Bot::logsHandler(const dpp::slashcommand_t &event) {
                 .bind(guild_id)
                 .step();
 
+        logger(INFO) << "Logs disabled for guild " << guild_id;
+
         return Bot::reply(event, dpp::embed()
                 .set_description("✒️ Les logs ont été désactivés")
                 .set_color(GREEN)
@@ -25,6 +27,7 @@ void Bot::logsHandler(const dpp::slashcommand_t &event) {
     }
 
     std::string channel_id = std::to_string(subcommand.get_value<dpp::snowflake>(0));
+    logger(INFO) << "Logs enabled for guild " << guild_id << " in channel " << channel_id;
 
     SQLQuery(db, "UPDATE guilds SET logs_channel = ? WHERE id = ?")
             .bind(channel_id)
@@ -51,6 +54,8 @@ void Bot::welcomeHandler(const dpp::slashcommand_t &event) {
                 .bind(guild_id)
                 .step();
 
+        logger(INFO) << "Welcome messages disabled for guild " << guild_id;
+
         return Bot::reply(event, dpp::embed()
                 .set_description("✒️ Les messages de bienvenue ont été désactivés")
                 .set_color(GREEN)
@@ -58,6 +63,7 @@ void Bot::welcomeHandler(const dpp::slashcommand_t &event) {
     }
 
     std::string channel_id = std::to_string(subcommand.get_value<dpp::snowflake>(0));
+    logger(INFO) << "Welcome messages enabled for guild " << guild_id << " in channel " << channel_id;
 
     SQLQuery(db, "UPDATE guilds SET welcome_channel = ?, welcome_message = ? WHERE id = ?")
             .bind(channel_id)
@@ -85,6 +91,8 @@ void Bot::newcomerHandler(const dpp::slashcommand_t &event) {
                 .bind(guild_id)
                 .step();
 
+        logger(INFO) << "Newcomer role disabled for guild " << guild_id;
+
         return Bot::reply(event, dpp::embed()
                 .set_description("✒️ Les nouveaux ne recevront plus de rôle")
                 .set_color(GREEN)
@@ -92,6 +100,7 @@ void Bot::newcomerHandler(const dpp::slashcommand_t &event) {
     }
 
     std::string role_id = std::to_string(subcommand.get_value<dpp::snowflake>(0));
+    logger(INFO) << "Newcomer role enabled for guild " << guild_id << " with role " << role_id;
 
     SQLQuery(db, "UPDATE guilds SET newcomer_role = ? WHERE id = ?")
             .bind(role_id)
@@ -118,6 +127,8 @@ void Bot::announceHandler(const dpp::slashcommand_t &event) {
                 .bind(guild_id)
                 .step();
 
+        logger(INFO) << "Announce disabled for guild " << guild_id;
+
         return Bot::reply(event, dpp::embed()
                 .set_description("✒️ Les annonces de niveaux ont été désactivées")
                 .set_color(GREEN)
@@ -125,6 +136,7 @@ void Bot::announceHandler(const dpp::slashcommand_t &event) {
     }
 
     std::string channel_id = std::to_string(subcommand.get_value<dpp::snowflake>(0));
+    logger(INFO) << "Announce enabled for guild " << guild_id << " in channel " << channel_id;
 
     SQLQuery(db, "UPDATE guilds SET announce_channel = ? WHERE id = ?")
             .bind(channel_id)

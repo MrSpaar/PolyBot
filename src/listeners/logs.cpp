@@ -9,6 +9,8 @@ void Bot::memberJoinHandler(const dpp::guild_member_add_t &event) {
     SQLRow row;
     std::string guild_id = std::to_string(event.added.guild_id);
 
+    logger(INFO) << "User " << event.added.user_id << " joined guild " << guild_id << std::endl;
+
     int rc = SQLQuery(db, "SELECT welcome_channel, welcome_message, logs_channel, newcomer_role FROM guilds WHERE id = ?")
             .bind(guild_id)
             .step(row);
@@ -47,6 +49,7 @@ void Bot::memberJoinHandler(const dpp::guild_member_add_t &event) {
 
 void Bot::memberLeaveHandler(const dpp::guild_member_remove_t &event) {
     SQLRow row;
+    logger(INFO) << "User " << event.removed->id << " left guild " << event.removing_guild->id << std::endl;
 
     int rc = SQLQuery(db, "SELECT logs_channel FROM guilds WHERE id = ?")
             .bind(std::to_string(event.removing_guild->id))
@@ -72,6 +75,8 @@ void Bot::banHandler(const dpp::guild_ban_add_t &event) {
     SQLRow row;
     std::string guild_id = std::to_string(event.banning_guild->id);
 
+    logger(INFO) << "User " << event.banned.id << " was banned from guild " << guild_id << std::endl;
+
     SQLQuery(db, "DELETE FROM users WHERE id = ? AND guild = ?;")
             .bind(std::to_string(event.banned.id))
             .bind(guild_id)
@@ -96,6 +101,7 @@ void Bot::banHandler(const dpp::guild_ban_add_t &event) {
 
 void Bot::unbanHandler(const dpp::guild_ban_remove_t &event) {
     SQLRow row;
+    logger(INFO) << "User " << event.unbanned.id << " was unbanned from guild " << event.unbanning_guild->id << std::endl;
 
     int rc = SQLQuery(db, "SELECT logs_channel FROM guilds WHERE id = ?")
             .bind(std::to_string(event.unbanning_guild->id))
