@@ -59,7 +59,7 @@ void Bot::messageHandler(const dpp::message_create_t &event) {
         ));
     }
 
-    logger(INFO) << "User " << user_id << " gained " << xp << " xp" << std::endl;
+    logger(INFO) << "User " << user_id << " gained xp" << std::endl;
 
     SQLQuery(db, "UPDATE users SET level = ?, xp = ? WHERE id = ? AND guild = ?")
           .bind(level)
