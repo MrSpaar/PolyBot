@@ -49,7 +49,7 @@ void Bot::memberJoinHandler(const dpp::guild_member_add_t &event) {
 
 void Bot::memberLeaveHandler(const dpp::guild_member_remove_t &event) {
     SQLRow row;
-    logger(INFO) << "User " << event.removed->id << " left guild " << event.removing_guild->id << std::endl;
+    logger(INFO) << "User " << event.removed.id << " left guild " << event.removing_guild->id << std::endl;
 
     int rc = SQLQuery(db, "SELECT logs_channel FROM guilds WHERE id = ?")
             .bind(std::to_string(event.removing_guild->id))
@@ -64,7 +64,7 @@ void Bot::memberLeaveHandler(const dpp::guild_member_remove_t &event) {
 
     message_create(dpp::message(log_channel_id, dpp::embed()
             .set_color(RED)
-            .set_description(":outbox_tray: " + event.removed->get_mention() + " a quitté le serveur")));
+            .set_description(":outbox_tray: " + event.removed.get_mention() + " a quitté le serveur")));
 }
 
 

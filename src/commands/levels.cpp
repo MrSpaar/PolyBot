@@ -38,7 +38,7 @@ void Bot::rankHandler(const dpp::slashcommand_t &event) {
     auto rank = row.get<int>("rank");
 
     dpp::guild_member member = has_param ? event.command.get_resolved_member(user_id) : event.command.member;
-    std::string effective_name = member.nickname, effective_avatar = member.get_avatar_url();
+    std::string effective_name = member.get_nickname(), effective_avatar = member.get_avatar_url();
 
     if (member.get_user() == nullptr) {
         dpp::user_identified user = user_get_sync(user_id);

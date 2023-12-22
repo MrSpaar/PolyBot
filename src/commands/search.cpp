@@ -14,7 +14,7 @@ struct {
 
 
 dpp::embed fetch_streams(const std::string &clientID, const std::string &category, const std::string &limit, std::vector<std::string> &filters) {
-    json j = Request("https://api.twitch.tv/helix/search/channels?live_only=true&query=" + category + "&first=" + limit)
+    dpp::json j = Request("https://api.twitch.tv/helix/search/channels?live_only=true&query=" + category + "&first=" + limit)
             .add_header("Client-ID", clientID)
             .add_header("Authorization", "Bearer " + twitch_oauth.token)
             .get();
@@ -70,7 +70,7 @@ void Bot::twitchHandler(const dpp::slashcommand_t &event) {
                        "&client_secret=" + env["TWITCH_TOKEN"] +
                        "&grant_type=client_credentials";
 
-    json j = Request("https://id.twitch.tv/oauth2/token")
+    dpp::json j = Request("https://id.twitch.tv/oauth2/token")
             .post(data);
 
     if (j.contains("error"))
@@ -92,7 +92,7 @@ void Bot::wikiHandler(const dpp::slashcommand_t &event) {
     auto subcommand = event.command.get_command_interaction().options[0];
     std::string title = subcommand.get_value<std::string>(0);
 
-    json j = Request(
+    dpp::json j = Request(
             "https://fr.wikipedia.org/w/api.php?format=json&action=query&prop=extracts|pageimages&exintro&explaintext&redirects=1&titles="
                     + title
     ).get();
@@ -103,7 +103,7 @@ void Bot::wikiHandler(const dpp::slashcommand_t &event) {
                 .set_color(RED), true
         );
 
-    json article = j["query"]["pages"].begin().value();
+    dpp::json article = j["query"]["pages"].begin().value();
     std::string full_url = "https://fr.wikipedia.org/wiki/" + article["title"].dump();
 
     Bot::reply(event, dpp::embed()

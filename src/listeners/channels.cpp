@@ -40,7 +40,7 @@ auto move_callback(
 
 
 void channel_joined_handler(Bot &bot, const dpp::guild_member &member, const dpp::snowflake &category_id) {
-    std::string effective_name = member.nickname;
+    std::string effective_name = member.get_nickname();
 
     if (effective_name.empty() && member.get_user() == nullptr) {
         dpp::user_identified user = bot.user_get_sync(member.user_id);
