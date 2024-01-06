@@ -55,15 +55,19 @@ public:
                 break;
         }
 
-        log << "[" << std::setfill('0') << std::setw(2) << ltm->tm_hour << ":"
+        log << "["
+            << std::setfill('0') << std::setw(2) << ltm->tm_mday << "/"
+            << std::setfill('0') << std::setw(2) << ltm->tm_mon+1 << "/"
+            << std::setfill('0') << std::setw(2) << ltm->tm_year-100 << " "
+            << std::setfill('0') << std::setw(2) << ltm->tm_hour << ":"
             << std::setfill('0') << std::setw(2) << ltm->tm_min << ":"
-            << std::setfill('0') << std::setw(2) << ltm->tm_sec << "] ";
+            << std::setfill('0') << std::setw(2) << ltm->tm_sec
+            << "] " << ss.str();
 
-        log << ss.str();
-        ss.str("");
         std::cout << log.str();
-        
         output << log.str();
+
+        ss.str("");
         output.flush();
 
         return *this;
