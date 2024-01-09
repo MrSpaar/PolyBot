@@ -10,6 +10,9 @@
 #include <type_traits>
 
 
+template<typename T>
+struct always_false: std::false_type {};
+
 struct SQLite {
     sqlite3 *ptr = nullptr;
 
@@ -37,7 +40,7 @@ public:
         else if constexpr (std::is_convertible_v<T, std::string>)
             return data[key];
         else
-            static_assert(std::false_type::value, "Unsupported type");
+            static_assert(always_false<T>::value, "Unsupported type");
     }
 private:
     std::map<std::string, std::string> data;
@@ -82,7 +85,7 @@ public:
         else if constexpr (std::is_convertible_v<T, std::string>)
             rc = sqlite3_bind_text(stmt, index++, value.data(), (int) value.size(), SQLITE_TRANSIENT);
         else
-            static_assert(std::false_type::value, "Unsupported type");
+            static_assert(always_false<T>::value, "Unsupported type");
 
         if (rc != SQLITE_OK)
             throw std::runtime_error("Could not bind value: " + std::string(sqlite3_errmsg(sqlite3_db_handle(stmt))));
