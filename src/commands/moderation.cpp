@@ -2,57 +2,39 @@
 // Created by mrspaar on 3/3/23.
 //
 
-#include "bot.h"
-#include "logger.h"
+#include "framework/command.h"
 
 
-void Bot::unbanHandler(const dpp::slashcommand_t &event) {
-    auto subcommand = event.command.get_command_interaction().options[0];
+DECLARE_COMMAND(Moderation) {
+    handlers["clear"] = WRAP_CMD(clearHandler);
 
-    std::string reason = "Pas de raison spécifiée";
-    dpp::snowflake member_id = subcommand.get_value<dpp::snowflake>(0);
-
-    if (subcommand.options.size() > 1)
-        reason = subcommand.get_value<std::string>(1);
-
-    guild_ban_delete(event.command.guild_id, member_id, [&](const dpp::confirmation_callback_t &callback) {
-        if (callback.is_error()) {
-            logger(WARNING) << "Failed to unban user " << member_id << " for reason: " << reason << std::endl;
-
-            return Bot::reply(event, dpp::embed()
-                    .set_description("❌ Impossible de débannir le membre")
-                    .set_color(RED), true
-            );
-        }
-
-        logger(INFO) << "Unbanned user " << member_id << " for reason: " << reason << std::endl;
-
-        Bot::reply(event, dpp::embed()
-                .set_color(GREEN)
-                .set_description("📜 <@" + std::to_string(member_id) + "> a été débanni\n❔ Raison : " + reason)
-        );
-    });
+    toBuild.push_back(Command {
+        "mod", "Base des commandes de modération", 
+        dpp::p_view_channel, {
+        {"clear", "Supprimer un nombre de messages", {
+            {dpp::co_integer, "nombre", "Nombre de messages à supprimer (entre 2 et 100)", true}
+        }}
+    }});
 }
 
-
-void Bot::clearHandler(const dpp::slashcommand_t &event) {
+COMMAND_HANDLER(clearHandler) {
     int64_t count = std::get<int64_t>(event.get_parameter("nombre"));
 
     if (count < 2 || count > 100)
-        return Bot::reply(event, dpp::embed()
-                .set_description("❌ Le nombre de messages à supprimer doit être compris entre 1 et 100")
-                .set_color(RED), true
+        return reply(event, dpp::embed()
+            .set_description("❌ Le nombre de messages à supprimer doit être compris entre 1 et 100")
+            .set_color(RED), true
         );
 
     dpp::snowflake channel_id = event.command.channel_id;
 
-    messages_get(channel_id, 0, 0, 0, count, [event, channel_id, this](const dpp::confirmation_callback_t &callback) {
+    cluster.messages_get(channel_id, 0, 0, 0, count, [&, event, channel_id](const dpp::confirmation_callback_t &callback) {
         if (callback.is_error()) {
             logger(WARNING) << "Failed to get messages to delete in channel " << channel_id << std::endl;
 
-            return Bot::reply(event, dpp::embed()
-                    .set_description("❌ Impossible de trouver les messages à supprimer")
-                    .set_color(RED), true
+            return reply(event, dpp::embed()
+                .set_description("❌ Impossible de trouver les messages à supprimer")
+                .set_color(RED), true
             );
         }
 
@@ -62,19 +44,19 @@ void Bot::clearHandler(const dpp::slashcommand_t &event) {
         for (auto &[snowflake, message]: messages)
             to_delete.push_back(snowflake);
 
-        message_delete_bulk(to_delete, channel_id, [&](const dpp::confirmation_callback_t &callback) {
+        cluster.message_delete_bulk(to_delete, channel_id, [&](const dpp::confirmation_callback_t &callback) {
             if (callback.is_error()) {
                 std::cout << callback.http_info.body << std::endl;
 
-                return Bot::reply(event, dpp::embed()
-                        .set_description("❌ Erreur lors de la suppression des messages")
-                        .set_color(RED), true
+                return reply(event, dpp::embed()
+                    .set_description("❌ Erreur lors de la suppression des messages")
+                    .set_color(RED), true
                 );
             }
 
-            Bot::reply(event, dpp::embed()
-                    .set_color(GREEN)
-                    .set_description("🗑 "+std::to_string(to_delete.size())+" messages ont été supprimés"), true
+            reply(event, dpp::embed()
+                .set_color(GREEN)
+                .set_description("🗑 "+std::to_string(to_delete.size())+" messages ont été supprimés"), true
             );
         });
     });

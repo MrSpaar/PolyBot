@@ -2,18 +2,25 @@
 // Created by mrspaar on 3/19/23.
 //
 
+#include <dpp/dispatcher.h>
 #include <random>
-#include "paginator.h"
+#include "utils/paginator.h"
+#include "framework/listener.h"
 
 
 std::map<dpp::snowflake, time_t> cooldowns;
 
 std::random_device rd;
-std::default_random_engine generator(rd());
-std::uniform_int_distribution<int> distribution(15, 25);
+std::default_random_engine generator{rd()};
+std::uniform_int_distribution<int> distribution{15, 25};
 
 
-void Bot::messageHandler(const dpp::message_create_t &event) {
+DECLARE_LISTENER(Levels) {
+    cluster.on_message_create(WRAP_LTNR(messageCreateHandler));
+    cluster.on_message_reaction_add(WRAP_LTNR(reactionHandler));
+}
+
+EVENT_HANDLER(messageCreateHandler, dpp::message_create_t) {
     if (event.msg.author.is_bot() || event.msg.author.is_system())
         return;
 
@@ -26,10 +33,8 @@ void Bot::messageHandler(const dpp::message_create_t &event) {
     std::string guild_id = std::to_string(event.msg.guild_id);
     std::string user_id = std::to_string(event.msg.author.id);
 
-    int rc = SQLQuery(db, "SELECT level, xp FROM users WHERE id = ? AND guild = ?")
-           .bind(user_id)
-           .bind(guild_id)
-           .step(row);
+    int rc = SQLQuery(conn, "SELECT level, xp FROM users WHERE id = ? AND guild = ?")
+        .bind(user_id).bind(guild_id).step(row);
 
     if (rc != SQLITE_ROW)
         return;
@@ -43,34 +48,31 @@ void Bot::messageHandler(const dpp::message_create_t &event) {
     if (xp >= next_cap) {
         level++;
 
-        rc = SQLQuery(db, "SELECT announce_channel FROM guilds WHERE id = ?")
-               .bind(guild_id)
-               .step(row);
+        rc = SQLQuery(conn, "SELECT announce_channel FROM guilds WHERE id = ?")
+            .bind(guild_id)
+            .step(row);
 
         if (rc != SQLITE_ROW)
             return;
 
         auto channel_id = row.get<std::string>("announce_channel");
-        message_create(dpp::message(channel_id, dpp::embed()
-                .set_color(GOLD)
-                .set_description(
-                        ":tada: " + event.msg.author.get_mention() + " vient de passer au niveau " + std::to_string(level) + " !"
-                )
+        cluster.message_create(dpp::message(channel_id, dpp::embed()
+            .set_color(GOLD)
+            .set_description(
+                    ":tada: " + event.msg.author.get_mention() + " vient de passer au niveau " + std::to_string(level) + " !"
+            )
         ));
     }
 
     logger(INFO) << "User " << user_id << " gained xp" << std::endl;
 
-    SQLQuery(db, "UPDATE users SET level = ?, xp = ? WHERE id = ? AND guild = ?")
-          .bind(level)
-          .bind(xp)
-          .bind(user_id)
-          .bind(guild_id)
-          .step();
+    SQLQuery(conn, "UPDATE users SET level = ?, xp = ? WHERE id = ? AND guild = ?")
+        .bind(level).bind(xp)
+        .bind(user_id).bind(guild_id)
+        .step();
 }
 
-
-void Bot::reactionHandler(const dpp::message_reaction_add_t &event) {
+EVENT_HANDLER(reactionHandler, dpp::message_reaction_add_t) {
     if (event.reacting_user.is_bot() || event.reacting_user.is_system())
         return;
 

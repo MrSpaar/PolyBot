@@ -3,8 +3,8 @@
 //
 
 #include <ranges>
-#include "bot.h"
-#include "request.h"
+#include "utils/request.h"
+#include "framework/command.h"
 
 
 struct {
@@ -47,8 +47,24 @@ dpp::embed fetch_streams(const std::string &clientID, const std::string &categor
     return emb;
 }
 
+DECLARE_COMMAND(Search) {
+    handlers["twitch"] = WRAP_CMD(twitchHandler);
+    handlers["wiki"] = WRAP_CMD(wikiHandler);
 
-void Bot::twitchHandler(const dpp::slashcommand_t &event) {
+    toBuild.push_back(Command {
+        "recherche", "Base des commandes de recherche", 
+        dpp::p_view_channel, {
+        {"twitch", "Rechercher des streams Twitch", {
+            {dpp::co_string, "category", "Catégorie de stream", true},
+            {dpp::co_string, "filters", "Filtres de recherche (optionnel)"}
+        }},
+        {"wiki", "Rechercher un article Wikipedia", {
+            {dpp::co_string, "title", "Titre de l'article", true}
+        }}
+    }});
+}
+
+COMMAND_HANDLER(twitchHandler) {
     logger(INFO) << "User " << event.command.member.user_id << " used twitch command" << std::endl;
 
     auto subcommand = event.command.get_command_interaction().options[0];
@@ -64,51 +80,51 @@ void Bot::twitchHandler(const dpp::slashcommand_t &event) {
     }
 
     if (!twitch_oauth.token.empty() && twitch_oauth.expires > time(nullptr))
-        return Bot::reply(event, fetch_streams(env["TWITCH_CLIENT"], category, limit, filters));
+        return reply(event, fetch_streams(env["TWITCH_CLIENT"], category, limit, filters));
 
     std::string data = "client_id=" + env["TWITCH_CLIENT"] +
-                       "&client_secret=" + env["TWITCH_TOKEN"] +
-                       "&grant_type=client_credentials";
+                    "&client_secret=" + env["TWITCH_TOKEN"] +
+                    "&grant_type=client_credentials";
 
     dpp::json j = Request("https://id.twitch.tv/oauth2/token")
             .post(data);
 
     if (j.contains("error"))
-        return Bot::reply(event, dpp::embed()
-                .set_description("❌ Une erreur est survenue")
-                .set_color(RED), true
+        return reply(event, dpp::embed()
+            .set_description("❌ Une erreur est survenue")
+            .set_color(RED), true
         );
 
     twitch_oauth.token = j["access_token"];
     twitch_oauth.expires = time(nullptr) + (time_t) j["expires_in"];
 
-    Bot::reply(event, fetch_streams(env["TWITCH_CLIENT"], category, limit, filters));
+    reply(event, fetch_streams(env["TWITCH_CLIENT"], category, limit, filters));
 }
 
 
-void Bot::wikiHandler(const dpp::slashcommand_t &event) {
+COMMAND_HANDLER(wikiHandler) {
     logger(INFO) << "User " << event.command.member.user_id << " used wiki command" << std::endl;
-    
+
     auto subcommand = event.command.get_command_interaction().options[0];
     std::string title = subcommand.get_value<std::string>(0);
 
     dpp::json j = Request(
-            "https://fr.wikipedia.org/w/api.php?format=json&action=query&prop=extracts|pageimages&exintro&explaintext&redirects=1&titles="
-                    + title
+        "https://fr.wikipedia.org/w/api.php?format=json&action=query&prop=extracts|pageimages&exintro&explaintext&redirects=1&titles="
+            + title
     ).get();
 
     if (j.empty() || j["query"]["pages"].contains("-1"))
-        return Bot::reply(event, dpp::embed()
-                .set_description("❌ Aucun résultat")
-                .set_color(RED), true
+        return reply(event, dpp::embed()
+            .set_description("❌ Aucun résultat")
+            .set_color(RED), true
         );
 
     dpp::json article = j["query"]["pages"].begin().value();
     std::string full_url = "https://fr.wikipedia.org/wiki/" + article["title"].dump();
 
-    Bot::reply(event, dpp::embed()
-            .set_color(BLUE)
-            .set_author("Wikipedia - " + (std::string) article["title"], "", "https://i.imgur.com/nDTQgbf.png")
-            .set_description((std::string) article["extract"] + " [En savoir plus](" + full_url + ")")
+    reply(event, dpp::embed()
+        .set_color(BLUE)
+        .set_author("Wikipedia - " + (std::string) article["title"], "", "https://i.imgur.com/nDTQgbf.png")
+        .set_description((std::string) article["extract"] + " [En savoir plus](" + full_url + ")")
     );
 }

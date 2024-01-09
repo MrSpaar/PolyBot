@@ -2,10 +2,7 @@
 // Created by mrspaar on 3/24/23.
 //
 
-#ifndef POLYBOT_REQUEST_H
-#define POLYBOT_REQUEST_H
-
-#include <sstream>
+#pragma once
 #include <curl/curl.h>
 #include <dpp/nlohmann/json.hpp>
 
@@ -58,6 +55,3 @@ private:
         return size * nmemb;
     }
 };
-
-
-#endif //POLYBOT_REQUEST_H

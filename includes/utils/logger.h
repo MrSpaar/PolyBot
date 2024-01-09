@@ -1,13 +1,22 @@
-#ifndef LOGS_H
-#define LOGS_H
+//
+// Created by MrSpaar on 08/01/2024.
+//
 
+#pragma once
 #include <fstream>
 #include <iomanip>
 #include <sstream>
 #include <iostream>
 
 
-enum Log {
+#define GREEN 0x2ECC71
+#define ORANGE 0xC27C0E
+#define RED 0xE74C3C
+#define BLUE 0x3498DB
+#define GOLD 0xF1C40F
+
+
+enum LOG_LEVEL {
     NONE = 0,
     INFO = 1,
     WARNING = 2,
@@ -15,13 +24,12 @@ enum Log {
     CRITICAL = 4
 };
 
-
 class Logger {
 public:
-    Logger(): level(Log::INFO), output("logs.txt", std::ios::app) {}
+    Logger(): level(LOG_LEVEL::INFO), output("logs.txt", std::ios::app) {}
 
-    Logger& operator()(Log value) {
-        level = value;
+    Logger& operator()(LOG_LEVEL level) {
+        this->level = level;
         return *this;
     }
 
@@ -39,18 +47,18 @@ public:
         tm *ltm = localtime(&now);
 
         switch (level) {
-            case Log::NONE:
+            case LOG_LEVEL::NONE:
                 break;
-            case Log::INFO:
+            case LOG_LEVEL::INFO:
                 log << "[INFO]";
                 break;
-            case Log::WARNING:
+            case LOG_LEVEL::WARNING:
                 log << "[WARN]";
                 break;
-            case Log::ERROR:
+            case LOG_LEVEL::ERROR:
                 log << "[ERR]";
                 break;
-            case Log::CRITICAL:
+            case LOG_LEVEL::CRITICAL:
                 log << "[CRIT]";
                 break;
         }
@@ -73,10 +81,7 @@ public:
         return *this;
     }
 private:
-    Log level;
+    LOG_LEVEL level;
     std::ofstream output;
     std::stringstream ss;
 };
-
-
-#endif //LOGS_H
