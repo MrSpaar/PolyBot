@@ -7,46 +7,6 @@
 #include "framework/command.h"
 
 
-struct {
-    std::string token;
-    std::time_t expires{};
-} twitch_oauth;
-
-
-dpp::embed fetch_streams(const std::string &clientID, const std::string &category, const std::string &limit, std::vector<std::string> &filters) {
-    dpp::json j = Request("https://api.twitch.tv/helix/search/channels?live_only=true&query=" + category + "&first=" + limit)
-            .add_header("Client-ID", clientID)
-            .add_header("Authorization", "Bearer " + twitch_oauth.token)
-            .get();
-
-    if (j.contains("error"))
-        return dpp::embed()
-                .set_description("❌ Aucun résultat")
-                .set_color(RED);
-
-    dpp::embed emb = dpp::embed()
-            .set_color(BLUE)
-            .set_author("Twitch - " + (std::string) j["data"][0]["game_name"], "", "https://i.imgur.com/gArdgyC.png");
-
-    for (auto &stream: j["data"] | std::ranges::views::filter([&filters](auto &stream) {
-        return filters.empty() || std::ranges::any_of(filters, [&stream](auto &word) {
-            std::string stream_title = stream["title"].dump();
-            transform(word.begin(), word.end(), word.begin(), ::tolower);
-            transform(stream_title.begin(), stream_title.end(), stream_title.begin(), ::tolower);
-            return stream_title.find(word) != std::string::npos;
-        });
-    })) {
-        emb.add_field(
-                (std::string) stream["display_name"],
-                "[" + (std::string) stream["title"] + "](https://twitch.tv/" +
-                (std::string) stream["broadcaster_login"] + ")",
-                true
-        );
-    }
-
-    return emb;
-}
-
 DECLARE_COMMAND(Search) {
     handlers["twitch"] = WRAP_CMD(twitchHandler);
     handlers["wiki"] = WRAP_CMD(wikiHandler);
@@ -64,6 +24,27 @@ DECLARE_COMMAND(Search) {
     }});
 }
 
+struct {
+    std::string token;
+    std::time_t expires{};
+
+    bool update(DotEnv &env) {
+        dpp::json j = Request("https://id.twitch.tv/oauth2/token").post(
+            "client_id=" + env["TWITCH_CLIENT"] +
+            "&client_secret=" + env["TWITCH_TOKEN"] +
+            "&grant_type=client_credentials"
+        );
+
+        if (j.contains("error"))
+            return false;
+
+        token = j["access_token"];
+        expires = time(nullptr) + (time_t) j["expires_in"];
+
+        return true;
+    }
+} twitch_oauth;
+
 COMMAND_HANDLER(twitchHandler) {
     logger(INFO) << "User " << event.command.member.user_id << " used twitch command" << std::endl;
 
@@ -79,15 +60,16 @@ COMMAND_HANDLER(twitchHandler) {
         copy(std::istream_iterator<std::string>(iss), std::istream_iterator<std::string>(), back_inserter(filters));
     }
 
-    if (!twitch_oauth.token.empty() && twitch_oauth.expires > time(nullptr))
-        return reply(event, fetch_streams(env["TWITCH_CLIENT"], category, limit, filters));
-
-    std::string data = "client_id=" + env["TWITCH_CLIENT"] +
-                    "&client_secret=" + env["TWITCH_TOKEN"] +
-                    "&grant_type=client_credentials";
-
-    dpp::json j = Request("https://id.twitch.tv/oauth2/token")
-            .post(data);
+    if ((twitch_oauth.token.empty() || twitch_oauth.expires < time(nullptr)) && !twitch_oauth.update(env))
+        return reply(event, dpp::embed()
+            .set_description("❌ Une erreur est survenue")
+            .set_color(RED), true
+        );
+    
+    dpp::json j = Request("https://api.twitch.tv/helix/search/channels?live_only=true&query=" + category + "&first=" + limit)
+        .add_header("Client-ID", env["TWITCH_CLIENT"])
+        .add_header("Authorization", "Bearer " + twitch_oauth.token)
+        .get();
 
     if (j.contains("error"))
         return reply(event, dpp::embed()
@@ -95,12 +77,28 @@ COMMAND_HANDLER(twitchHandler) {
             .set_color(RED), true
         );
 
-    twitch_oauth.token = j["access_token"];
-    twitch_oauth.expires = time(nullptr) + (time_t) j["expires_in"];
+    dpp::embed embed = dpp::embed()
+        .set_color(BLUE)
+        .set_author("Twitch - " + (std::string) j["data"][0]["game_name"], "", "https://i.imgur.com/gArdgyC.png");
 
-    reply(event, fetch_streams(env["TWITCH_CLIENT"], category, limit, filters));
+    for (auto &stream: j["data"] | std::ranges::views::filter([&filters](auto &stream) {
+        return filters.empty() || std::ranges::any_of(filters, [&stream](auto &word) {
+            std::string stream_title = stream["title"].dump();
+            transform(word.begin(), word.end(), word.begin(), ::tolower);
+            transform(stream_title.begin(), stream_title.end(), stream_title.begin(), ::tolower);
+            return stream_title.find(word) != std::string::npos;
+        });
+    })) {
+        embed.add_field(
+                (std::string) stream["display_name"],
+                "[" + (std::string) stream["title"] + "](https://twitch.tv/" +
+                (std::string) stream["broadcaster_login"] + ")",
+                true
+        );
+    }
+
+    reply(event, embed);
 }
-
 
 COMMAND_HANDLER(wikiHandler) {
     logger(INFO) << "User " << event.command.member.user_id << " used wiki command" << std::endl;
