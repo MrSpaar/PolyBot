@@ -1,0 +1,6 @@
+.env
+.idea/
+.gradle/
+gradle/
+build/
+database.db

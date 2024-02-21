@@ -1,0 +1,15 @@
+[package]
+name = "polybot"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+dotenv = "0.15.0"
+once_cell = "1.17.1"
+reqwest = { version = "0.11", features = ["json"] }
+serde = { version = "1.0.130", features = ["derive"] }
+tokio = { version = "1.21.2", default-features = false, features = ["macros", "rt-multi-thread"] }
+sqlx = { version = "0.6.3", features = ["sqlite", "macros", "runtime-tokio-rustls"] }
+serenity = { version = "0.11.5", default-features = false, features = ["client", "builder", "model", "gateway", "voice", "rustls_backend"] }

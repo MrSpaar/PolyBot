@@ -1,0 +1,9 @@
+discord.py
+aiohttp
+cairosvg
+chess
+matplotlib
+motor
+yt-dlp
+pynacl
+discord-components
