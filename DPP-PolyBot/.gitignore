@@ -1,0 +1,10 @@
+/build/
+/cmake-build-run/
+/cmake-build-debug/
+/cmake-build-release/
+
+/.idea/
+/.vscode/
+/.cache/
+/data/
+/.env
