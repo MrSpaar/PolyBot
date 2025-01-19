@@ -1,6 +1,6 @@
 # Projet
 
-Build le projet nécessite [`CPP 17`](https://adoptium.net/) minimum. La configuration du bot se fait avec un fichier `.env` :
+Build le projet nécessite `C++ 17` minimum. La configuration du bot se fait avec un fichier `.env` :
 ```dotenv
 GEN_CHANNEL_PREFIX="..."
 TEMP_CHANNEL_PREFIX="..."
